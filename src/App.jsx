@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Upload } from 'lucide-react';
 
 const STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/4gMeVcbaLbU63cD0005AQ01';
-const INTAKE_WEBHOOK_URL = import.meta.env.VITE_INTAKE_WEBHOOK_URL;
+const INTAKE_API_URL = '/api/intake';
 const INTAKE_TIMEOUT_MS = 5000;
 const INTAKE_RETRY_DELAY_MS = 400;
 const INTAKE_MAX_ATTEMPTS = 2;
@@ -286,10 +286,6 @@ function QuizApp() {
     const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
     const submitIntake = async () => {
-        if (!INTAKE_WEBHOOK_URL) {
-            throw new Error('Webhook URL is not configured');
-        }
-
         const payload = {
             businessName: formData.businessName || '',
             contactEmail: formData.contactEmail || '',
@@ -312,7 +308,7 @@ function QuizApp() {
             const timeoutId = setTimeout(() => controller.abort(), INTAKE_TIMEOUT_MS);
 
             try {
-                const response = await fetch(INTAKE_WEBHOOK_URL, {
+                const response = await fetch(INTAKE_API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload),
