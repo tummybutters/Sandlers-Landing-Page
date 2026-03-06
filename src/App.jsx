@@ -270,13 +270,12 @@ function QuizApp() {
     const [formData, setFormData] = useState({});
     const [direction, setDirection] = useState(0);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
 
     const currentStep = steps[currentStepIdx];
     const progress = ((currentStepIdx + 1) / steps.length) * 100;
     const isLastStep = currentStepIdx === steps.length - 1;
 
-    const handleNext = async () => {
+    const handleNext = () => {
         if (!isLastStep) {
             setDirection(1);
             setCurrentStepIdx(prev => prev + 1);
@@ -284,20 +283,9 @@ function QuizApp() {
         }
 
         setLoading(true);
-        setError(null);
-        try {
-            const res = await fetch('/api/create-checkout', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Something went wrong');
-            window.location.href = data.url;
-        } catch (err) {
-            setError(err.message);
-            setLoading(false);
-        }
+        const params = new URLSearchParams();
+        if (formData.contactEmail) params.set('prefilled_email', formData.contactEmail);
+        window.location.href = `https://buy.stripe.com/4gMeVcbaLbU63cD0005AQ01?${params.toString()}`;
     };
 
     const handlePrev = () => {
@@ -419,8 +407,6 @@ function QuizApp() {
                                 ))}
                             </div>
                         )}
-
-                        {error && <p className="checkout-error">{error}</p>}
 
                         <div className="nav-row">
                             <button
