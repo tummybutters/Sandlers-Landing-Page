@@ -47,188 +47,6 @@ function SuccessPage() {
   );
 }
 
-function hsvToHex(h, s, v) {
-  s /= 100;
-  v /= 100;
-  const k = (n) => (n + h / 60) % 6;
-  const f = (n) => v - v * s * Math.max(0, Math.min(k(n), 4 - k(n), 1));
-  const toH = (n) => Math.round(f(n) * 255).toString(16).padStart(2, '0');
-  return `#${toH(5)}${toH(3)}${toH(1)}`;
-}
-
-function SpectrumPicker({ fieldName, label, onChange }) {
-  const [hue, setHue] = useState(220);
-  const [sat, setSat] = useState(65);
-  const [val, setVal] = useState(35);
-  const gradRef = useRef(null);
-  const hueRef = useRef(null);
-  const valRef = useRef(null);
-  const isDraggingGrad = useRef(false);
-  const isDraggingHue = useRef(false);
-  const isDraggingVal = useRef(false);
-
-  const hex = hsvToHex(hue, sat, val);
-
-  useEffect(() => {
-    onChange(fieldName, hex);
-  }, [fieldName, hex, onChange]);
-
-  const updateGrad = useCallback((clientX, clientY) => {
-    const rect = gradRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const x = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-    const y = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
-    setSat(Math.round(x * 100));
-    setVal(Math.round((1 - y) * 100));
-  }, []);
-
-  const updateHue = useCallback((clientX) => {
-    const rect = hueRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const x = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-    setHue(Math.round(x * 360));
-  }, []);
-
-  const updateVal = useCallback((clientX) => {
-    const rect = valRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const x = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-    setVal(Math.round(x * 100));
-  }, []);
-
-  useEffect(() => {
-    const onMove = (event) => {
-      const cx = event.touches ? event.touches[0].clientX : event.clientX;
-      const cy = event.touches ? event.touches[0].clientY : event.clientY;
-      if (isDraggingGrad.current) updateGrad(cx, cy);
-      if (isDraggingHue.current) updateHue(cx);
-      if (isDraggingVal.current) updateVal(cx);
-    };
-    const onUp = () => {
-      isDraggingGrad.current = false;
-      isDraggingHue.current = false;
-      isDraggingVal.current = false;
-    };
-
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
-    window.addEventListener('touchmove', onMove, { passive: false });
-    window.addEventListener('touchend', onUp);
-
-    return () => {
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup', onUp);
-      window.removeEventListener('touchmove', onMove);
-      window.removeEventListener('touchend', onUp);
-    };
-  }, [updateGrad, updateHue, updateVal]);
-
-  return (
-    <div className="spectrum-picker">
-      <p className="spectrum-label">{label}</p>
-
-      <div
-        ref={gradRef}
-        className="grad-square"
-        style={{
-          background: `
-            linear-gradient(to bottom, transparent, #000),
-            linear-gradient(to right, #fff, hsl(${hue}, 100%, 50%))
-          `,
-        }}
-        onMouseDown={(event) => {
-          isDraggingGrad.current = true;
-          updateGrad(event.clientX, event.clientY);
-          event.preventDefault();
-        }}
-        onTouchStart={(event) => {
-          isDraggingGrad.current = true;
-          updateGrad(event.touches[0].clientX, event.touches[0].clientY);
-        }}
-      >
-        <div className="grad-cursor" style={{ left: `${sat}%`, top: `${100 - val}%` }} />
-      </div>
-
-      <div
-        ref={hueRef}
-        className="hue-strip"
-        onMouseDown={(event) => {
-          isDraggingHue.current = true;
-          updateHue(event.clientX);
-          event.preventDefault();
-        }}
-        onTouchStart={(event) => {
-          isDraggingHue.current = true;
-          updateHue(event.touches[0].clientX);
-        }}
-      >
-        <div className="hue-cursor" style={{ left: `${(hue / 360) * 100}%` }} />
-      </div>
-
-      <div
-        ref={valRef}
-        className="val-strip"
-        style={{ background: `linear-gradient(90deg, #000, hsl(${hue}, 100%, 50%))` }}
-        onMouseDown={(event) => {
-          isDraggingVal.current = true;
-          updateVal(event.clientX);
-          event.preventDefault();
-        }}
-        onTouchStart={(event) => {
-          isDraggingVal.current = true;
-          updateVal(event.touches[0].clientX);
-        }}
-      >
-        <div className="hue-cursor" style={{ left: `${val}%` }} />
-      </div>
-
-      <div className="color-readout">
-        <div className="color-block" style={{ background: hex }} />
-        <div className="hex-readout">
-          <span className="hex-symbol">#</span>
-          <span className="hex-code">{hex.replace('#', '').toUpperCase()}</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ColorsStep({ formData, updateFormData }) {
-  const [active, setActive] = useState('primaryColor');
-
-  return (
-    <div className="colors-step">
-      <div className="color-tabs">
-        <button
-          className={`color-tab${active === 'primaryColor' ? ' color-tab-active' : ''}`}
-          onClick={() => setActive('primaryColor')}
-        >
-          Main Color
-          {formData.primaryColor && (
-            <span className="tab-swatch" style={{ background: formData.primaryColor }} />
-          )}
-        </button>
-        <button
-          className={`color-tab${active === 'secondaryColor' ? ' color-tab-active' : ''}`}
-          onClick={() => setActive('secondaryColor')}
-        >
-          Secondary Color
-          {formData.secondaryColor && (
-            <span className="tab-swatch" style={{ background: formData.secondaryColor }} />
-          )}
-        </button>
-      </div>
-
-      <div style={{ display: active === 'primaryColor' ? 'block' : 'none' }}>
-        <SpectrumPicker fieldName="primaryColor" label="Main Color" onChange={updateFormData} />
-      </div>
-      <div style={{ display: active === 'secondaryColor' ? 'block' : 'none' }}>
-        <SpectrumPicker fieldName="secondaryColor" label="Secondary Color" onChange={updateFormData} />
-      </div>
-    </div>
-  );
-}
-
 const TEMPLATES = [
   { id: '1', name: 'Obsidian', desc: 'Dark luxury', url: '/preview/1' },
   { id: '2', name: 'Clearfield', desc: 'Clean & light', url: '/preview/2' },
@@ -282,7 +100,7 @@ const steps = [
   {
     id: 'contact',
     title: 'Contact Info',
-    description: 'The site needs a way for banks, clients, and partners to see the business exists.',
+    description: 'Basic information for the site and for bank, client, and partner validation.',
     fields: [
       { name: 'businessName', label: 'Business Name', placeholder: 'Blue Water Investing', type: 'text', required: true },
       { name: 'contactEmail', label: 'Contact Email', placeholder: 'email@example.com', type: 'email', required: true },
@@ -301,35 +119,15 @@ const steps = [
     ],
   },
   {
-    id: 'description',
-    title: 'What the Business Does',
-    description: 'One sentence is enough. We can shape it into polished website copy.',
-    fields: [
-      {
-        name: 'businessDescription',
-        label: 'What does your company do?',
-        placeholder: 'We help real estate operators access capital and move opportunities forward...',
-        type: 'textarea',
-        required: true,
-      },
-    ],
-  },
-  {
     id: 'area',
     title: 'Service Area',
-    description: 'Where do you operate?',
+    description: 'This helps us tailor the site copy to where the business actually operates.',
     fields: [{ name: 'serviceArea', label: 'Areas you serve', placeholder: 'Nationwide or Arizona and Nevada', type: 'text', required: true }],
-  },
-  {
-    id: 'colors',
-    title: 'Brand Colors',
-    description: 'Pick your main and secondary colors. Drag the spectrum, then switch tabs.',
-    fields: [],
   },
   {
     id: 'template',
     title: 'Choose a Design',
-    description: 'Select a layout. Click a preview to select it, or open full size in a new tab.',
+    description: 'Pick the general page style. Colors will be handled for them automatically.',
     fields: [],
   },
   {
@@ -337,20 +135,6 @@ const steps = [
     title: 'Logo',
     description: 'Optional. If blank, automation can generate a premium text-first logo.',
     fields: [{ name: 'logo', label: 'Upload a logo', type: 'file' }],
-  },
-  {
-    id: 'cta',
-    title: 'Call To Action',
-    description: 'This decides the main button treatment on the finished site.',
-    fields: [
-      {
-        name: 'preferredContact',
-        label: 'Preferred contact method',
-        type: 'radio',
-        options: ['Call', 'Text', 'Email'],
-        required: true,
-      },
-    ],
   },
 ];
 
@@ -401,11 +185,9 @@ export default function IntakeApp() {
       domain1: formData.domain1 || '',
       domain2: formData.domain2 || '',
       domain3: formData.domain3 || '',
-      businessDescription: formData.businessDescription || '',
       serviceArea: formData.serviceArea || '',
-      primaryColor: formData.primaryColor || '',
-      secondaryColor: formData.secondaryColor || '',
-      preferredContact: formData.preferredContact || '',
+      templateId: formData.templateId || '',
+      preferredContact: 'Email',
       logoFileName: formData.logo?.name || '',
       submittedAt: new Date().toISOString(),
     };
@@ -520,9 +302,7 @@ export default function IntakeApp() {
               <p className="step-description">{currentStep.description}</p>
             </div>
 
-            {currentStep.id === 'colors' ? (
-              <ColorsStep formData={formData} updateFormData={updateFormData} />
-            ) : currentStep.id === 'template' ? (
+            {currentStep.id === 'template' ? (
               <TemplateStep formData={formData} updateFormData={updateFormData} />
             ) : (
               <div className="fields-container">

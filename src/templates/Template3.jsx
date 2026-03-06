@@ -42,9 +42,9 @@ const s = {
 };
 
 const SERVICES = [
-  ['Deal Sourcing & Acquisition', 'We identify and secure exclusive investment opportunities at competitive valuations, leveraging deep market relationships to deliver superior deal flow to our partners.'],
-  ['Capital Structuring', 'From equity placement to debt facilitation, we architect capital stacks that optimize risk-adjusted returns and align precisely with each investor\'s objectives.'],
-  ['Transaction Management', 'End-to-end oversight from letter of intent through closing — our team handles every detail to ensure seamless, transparent execution on every deal.'],
+  ['Strategic Consulting', 'Provides strategic consulting and operational advisory services to builders, developers, and real estate investors, with support calibrated to each engagement and operating environment.'],
+  ['Development Planning', 'Advises on development planning, project leadership, and implementation strategy to help teams maintain alignment across moving parts and priorities.'],
+  ['Operational Advisory', 'Offers project oversight and business management consulting for organizations seeking experienced guidance across complex real estate and development activity.'],
 ];
 
 export default function Template3() {
@@ -67,10 +67,10 @@ export default function Template3() {
         <div style={s.heroAccent2} />
         <div style={s.heroContent}>
           <span style={s.heroKicker} data-r>Capital & Advisory</span>
-          <h1 style={s.h1} data-r>Unlock<br />Capital.<br />Close Deals.</h1>
+          <h1 style={s.h1} data-r>Guide<br />Complexity.<br />Maintain Direction.</h1>
           <div style={s.heroMeta} data-r>
-            <p style={s.heroP}>We connect qualified investors with exclusive opportunities across private real estate, structured credit, and alternative assets.</p>
-            <a href="#contact" style={s.btn}>Explore Opportunities</a>
+            <p style={s.heroP}>Provides strategic consulting and operational advisory services to builders, developers, and real estate investors, including development planning, project oversight, and business management consulting.</p>
+            <a href="#contact" style={s.btn}>Start a Conversation</a>
           </div>
         </div>
       </section>
@@ -78,10 +78,10 @@ export default function Template3() {
       <div style={{ ...s.section, paddingBottom: '48px' }}>
         <span style={s.label}>About</span>
         <div style={s.aboutGrid}>
-          <h2 style={{ ...s.h2, marginBottom: 0 }}>A Proven<br />Track Record</h2>
+          <h2 style={{ ...s.h2, marginBottom: 0 }}>Experienced<br />Advisory Support</h2>
           <div>
-            <p style={s.p}>We are a privately held capital advisory firm focused on identifying, structuring, and executing investments across real estate and private markets. Our process is rigorous, our relationships are built on trust.</p>
-            <p style={s.p}>With deep expertise across acquisition, underwriting, and asset management, we provide partners with full-service support from initial evaluation through disposition — ensuring clarity at every stage.</p>
+            <p style={s.p}>Provides strategic consulting and operational advisory services to builders, developers, and real estate investors, with a focus on maintaining momentum across planning and execution.</p>
+            <p style={s.p}>Scope may include development planning, project oversight, and business management consulting that helps leadership teams navigate complexity with structure and discretion.</p>
           </div>
         </div>
       </div>
@@ -107,8 +107,8 @@ export default function Template3() {
         <div style={s.contactWrap}>
           <div>
             <span style={{ ...s.label, color: 'rgba(255,255,255,0.4)' }}>Contact</span>
-            <h2 style={{ ...s.h2, color: '#fff' }}>Ready to Move?</h2>
-            <p style={{ ...s.p, color: 'rgba(255,255,255,0.55)', maxWidth: '100%' }}>Reach out to discuss opportunities, partnerships, or general inquiries. We respond to all qualified inquiries within 24 hours.</p>
+            <h2 style={{ ...s.h2, color: '#fff' }}>Ready to Connect?</h2>
+            <p style={{ ...s.p, color: 'rgba(255,255,255,0.55)', maxWidth: '100%' }}>Reach out to discuss a project, advisory engagement, or general inquiry. We respond to all qualified inquiries within 24 hours.</p>
             <div style={{ marginTop: '32px', color: 'rgba(255,255,255,0.45)', fontSize: '0.9rem', lineHeight: 2.4, fontFamily: 'Arial, sans-serif' }}>
               <div>contact@yourcompany.com</div>
               <div>(000) 000-0000</div>
