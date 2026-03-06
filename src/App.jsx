@@ -1,3 +1,4 @@
+// Triggering Vercel deployment with a minor update
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Upload } from 'lucide-react';
