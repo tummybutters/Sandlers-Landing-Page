@@ -270,6 +270,7 @@ function QuizApp() {
     const [formData, setFormData] = useState({});
     const [direction, setDirection] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     const currentStep = steps[currentStepIdx];
     const progress = ((currentStepIdx + 1) / steps.length) * 100;
@@ -282,11 +283,21 @@ function QuizApp() {
             return;
         }
 
-        // Last step — redirect to Stripe payment link
         setLoading(true);
-        const params = new URLSearchParams();
-        if (formData.contactEmail) params.set('prefilled_email', formData.contactEmail);
-        window.location.href = `https://buy.stripe.com/4gMeVcbaLbU63cD0005AQ01?${params.toString()}`;
+        setError(null);
+        try {
+            const res = await fetch('/api/create-checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Something went wrong');
+            window.location.href = data.url;
+        } catch (err) {
+            setError(err.message);
+            setLoading(false);
+        }
     };
 
     const handlePrev = () => {
@@ -409,6 +420,8 @@ function QuizApp() {
                             </div>
                         )}
 
+                        {error && <p className="checkout-error">{error}</p>}
+
                         <div className="nav-row">
                             <button
                                 onClick={handlePrev}
@@ -422,7 +435,7 @@ function QuizApp() {
                                 disabled={loading}
                                 className={`nav-next${loading ? ' nav-loading' : ''}`}
                             >
-                                {loading ? 'Redirecting...' : isLastStep ? 'Get My Website →' : 'Continue →'}
+                                {loading ? 'Processing...' : isLastStep ? 'Submit & Pay →' : 'Continue →'}
                             </button>
                         </div>
                     </motion.div>

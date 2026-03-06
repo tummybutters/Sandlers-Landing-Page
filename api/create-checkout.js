@@ -5,7 +5,7 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_PRICE_ID) {
+    if (!process.env.STRIPE_SECRET_KEY) {
         return res.status(500).json({ error: 'Server configuration error' });
     }
 
@@ -26,12 +26,36 @@ export default async function handler(req, res) {
         preferredContact,
     } = req.body;
 
+    // Webhook 1 — store quiz intake data (fire-and-forget, does not block checkout)
+    if (process.env.INTAKE_WEBHOOK_URL) {
+        fetch(process.env.INTAKE_WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                businessName,
+                contactEmail,
+                phoneNumber,
+                businessAddress,
+                domain1,
+                domain2,
+                domain3,
+                businessDescription,
+                serviceArea,
+                primaryColor,
+                secondaryColor,
+                preferredContact,
+                submittedAt: new Date().toISOString(),
+            }),
+        }).catch((err) => console.error('Intake webhook error:', err.message));
+    }
+
+    // Webhook 2 — create Stripe Checkout Session, redirect customer to pay
     try {
         const session = await stripe.checkout.sessions.create({
             mode: 'payment',
             line_items: [
                 {
-                    price: process.env.STRIPE_PRICE_ID,
+                    price: process.env.STRIPE_PRICE_ID || 'price_1T7mn9AoSgPDShfedsT8QEHh',
                     quantity: 1,
                 },
             ],
