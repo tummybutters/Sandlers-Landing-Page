@@ -12,23 +12,27 @@ const c = {
 };
 
 const s = {
-  root: { minHeight: '100vh', background: c.bg, color: c.text, fontFamily: 'Georgia, serif', overflowX: 'hidden' },
-  hero: { minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '80px 48px', position: 'relative' },
+  root: { minHeight: '100vh', background: c.bg, color: c.text, fontFamily: "'Cormorant Garamond', Georgia, serif", overflowX: 'hidden' },
+  nav: { padding: '0 60px', height: '74px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${c.rule}`, position: 'sticky', top: 0, zIndex: 10, background: 'rgba(7, 7, 11, 0.94)', backdropFilter: 'blur(10px)' },
+  navBrand: { fontSize: '12px', fontWeight: 700, letterSpacing: '0.28em', textTransform: 'uppercase', color: c.text, fontFamily: 'system-ui, sans-serif' },
+  navLinks: { display: 'flex', gap: '28px', fontSize: '11px', fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', fontFamily: 'system-ui, sans-serif', color: c.muted },
+  navLink: { color: 'inherit', textDecoration: 'none' },
+  hero: { minHeight: 'calc(100vh - 74px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '72px 48px 84px', position: 'relative' },
   heroRule: { position: 'absolute', bottom: 0, left: '60px', right: '60px', height: '1px', background: c.rule },
-  eyebrow: { fontSize: '10px', letterSpacing: '0.42em', textTransform: 'uppercase', color: c.gold, marginBottom: '32px', fontFamily: 'system-ui, sans-serif' },
-  h1: { fontSize: 'clamp(2.8rem, 6vw, 5.5rem)', fontWeight: 400, lineHeight: 1.02, fontStyle: 'italic', marginBottom: '28px', maxWidth: '780px' },
-  heroP: { fontSize: '1rem', lineHeight: 1.8, color: c.muted, maxWidth: '500px', marginBottom: '48px', fontFamily: 'system-ui, sans-serif' },
+  eyebrow: { fontSize: '10px', letterSpacing: '0.42em', textTransform: 'uppercase', color: c.gold, marginBottom: '22px', fontFamily: 'system-ui, sans-serif', fontWeight: 700 },
+  h1: { fontSize: 'clamp(3.4rem, 6vw, 5.8rem)', fontWeight: 600, lineHeight: 0.96, fontStyle: 'italic', marginBottom: '22px', maxWidth: '860px' },
+  heroP: { fontSize: '1.02rem', lineHeight: 1.75, color: c.muted, maxWidth: '560px', marginBottom: '38px', fontFamily: 'system-ui, sans-serif' },
   btn: { padding: '13px 36px', border: `1px solid ${c.goldDim}`, color: c.gold, fontSize: '10px', letterSpacing: '0.3em', textTransform: 'uppercase', textDecoration: 'none', display: 'inline-block', fontFamily: 'system-ui, sans-serif', background: 'transparent', cursor: 'pointer' },
   wrap: { maxWidth: '1040px', margin: '0 auto', padding: '0 60px' },
-  section: { padding: '96px 0' },
+  section: { padding: '82px 0' },
   label: { fontSize: '9px', letterSpacing: '0.45em', textTransform: 'uppercase', color: c.gold, marginBottom: '20px', fontFamily: 'system-ui, sans-serif', display: 'block' },
-  h2: { fontSize: 'clamp(2rem, 4vw, 3.4rem)', fontWeight: 400, fontStyle: 'italic', lineHeight: 1.08, marginBottom: '36px' },
+  h2: { fontSize: 'clamp(2.4rem, 4vw, 3.7rem)', fontWeight: 600, fontStyle: 'italic', lineHeight: 1.02, marginBottom: '28px' },
   p: { fontSize: '0.97rem', lineHeight: 1.85, color: c.muted, marginBottom: '18px', fontFamily: 'system-ui, sans-serif', maxWidth: '600px' },
   rule: { height: '1px', background: c.rule, margin: '0 60px' },
   svcGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1px', background: c.rule, marginTop: '48px' },
   svc: { padding: '40px 32px', background: c.bg },
   svcMark: { width: '28px', height: '1px', background: c.gold, marginBottom: '24px' },
-  svcH: { fontSize: '1.08rem', fontStyle: 'italic', marginBottom: '14px', lineHeight: 1.3 },
+  svcH: { fontSize: '1.22rem', fontStyle: 'italic', fontWeight: 600, marginBottom: '14px', lineHeight: 1.2 },
   svcP: { fontSize: '0.88rem', lineHeight: 1.75, color: c.muted, fontFamily: 'system-ui, sans-serif' },
   contactSection: { background: c.surface, padding: '96px 60px' },
   contactWrap: { maxWidth: '1040px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px' },
@@ -57,6 +61,15 @@ export default function Template1() {
 
   return (
     <div ref={ref} style={s.root}>
+      <nav style={s.nav}>
+        <span style={s.navBrand} data-r>Your Company</span>
+        <div style={s.navLinks} data-r>
+          <a href="#about" style={s.navLink}>About</a>
+          <a href="#services" style={s.navLink}>Services</a>
+          <a href="#contact" style={s.navLink}>Contact</a>
+        </div>
+      </nav>
+
       <section style={s.hero}>
         <span style={s.eyebrow} data-r>Capital & Advisory</span>
         <h1 style={s.h1} data-r>Strategic Perspective<br />for Complex Initiatives</h1>
@@ -67,7 +80,7 @@ export default function Template1() {
 
       <div style={s.rule} />
       <div style={s.wrap}>
-        <div style={s.section}>
+        <div id="about" style={s.section}>
           <span style={s.label}>About</span>
           <h2 style={s.h2}>An experienced approach<br />to advisory leadership</h2>
           <p style={s.p}>Provides strategic consulting and operational advisory services to builders, developers, and real estate investors, with an emphasis on thoughtful planning, measured execution, and steady project leadership.</p>
@@ -77,7 +90,7 @@ export default function Template1() {
 
       <div style={s.rule} />
       <div style={s.wrap}>
-        <div style={{ ...s.section, paddingBottom: '0' }}>
+        <div id="services" style={{ ...s.section, paddingBottom: '0' }}>
           <span style={s.label}>Services</span>
           <h2 style={s.h2}>What we offer</h2>
         </div>

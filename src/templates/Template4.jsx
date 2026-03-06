@@ -14,27 +14,28 @@ const c = {
 
 const s = {
   root: { minHeight: '100vh', background: c.bg, color: c.text, fontFamily: 'Georgia, "Times New Roman", serif', overflowX: 'hidden' },
-  nav: { padding: '0 60px', height: '72px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${c.border}` },
-  navBrand: { fontSize: '13px', letterSpacing: '0.35em', textTransform: 'uppercase', fontFamily: 'system-ui, sans-serif', fontWeight: 600 },
-  navLinks: { display: 'flex', gap: '36px', fontSize: '12px', letterSpacing: '0.18em', textTransform: 'uppercase', fontFamily: 'system-ui, sans-serif', color: c.muted },
-  hero: { background: c.cream, padding: '120px 60px', textAlign: 'center', borderBottom: `1px solid ${c.border}`, position: 'relative' },
+  nav: { padding: '0 60px', height: '74px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${c.border}`, background: 'rgba(250, 245, 238, 0.94)', position: 'sticky', top: 0, zIndex: 10, backdropFilter: 'blur(10px)' },
+  navBrand: { fontSize: '13px', letterSpacing: '0.3em', textTransform: 'uppercase', fontFamily: 'system-ui, sans-serif', fontWeight: 700 },
+  navLinks: { display: 'flex', gap: '36px', fontSize: '12px', letterSpacing: '0.18em', textTransform: 'uppercase', fontFamily: 'system-ui, sans-serif', color: c.muted, fontWeight: 600 },
+  navLink: { color: 'inherit', textDecoration: 'none' },
+  hero: { background: c.cream, padding: '86px 60px 94px', textAlign: 'center', borderBottom: `1px solid ${c.border}`, position: 'relative' },
   heroDeco: { width: '80px', height: '1px', background: c.tan, margin: '0 auto 32px' },
   heroBadge: { fontSize: '10px', letterSpacing: '0.5em', textTransform: 'uppercase', color: c.tan, marginBottom: '24px', display: 'block', fontFamily: 'system-ui, sans-serif' },
-  h1: { fontSize: 'clamp(2.6rem, 5vw, 4.8rem)', fontWeight: 400, lineHeight: 1.1, fontStyle: 'italic', marginBottom: '28px', color: c.burgundy },
-  heroP: { fontSize: '1.05rem', lineHeight: 1.85, color: c.muted, maxWidth: '540px', margin: '0 auto 48px', fontFamily: 'system-ui, sans-serif' },
+  h1: { fontSize: 'clamp(3rem, 5.2vw, 5rem)', fontWeight: 600, lineHeight: 1.04, fontStyle: 'italic', marginBottom: '22px', color: c.burgundy, maxWidth: '900px', marginInline: 'auto' },
+  heroP: { fontSize: '1rem', lineHeight: 1.78, color: c.muted, maxWidth: '560px', margin: '0 auto 38px', fontFamily: 'system-ui, sans-serif' },
   btn: { padding: '14px 40px', background: c.burgundy, color: '#fff', fontSize: '11px', letterSpacing: '0.25em', textTransform: 'uppercase', textDecoration: 'none', display: 'inline-block', fontFamily: 'system-ui, sans-serif', border: 'none', cursor: 'pointer' },
   ornament: { textAlign: 'center', color: c.tan, fontSize: '1.2rem', margin: '48px 0 0', letterSpacing: '0.5em' },
-  section: { padding: '96px 60px', maxWidth: '1060px', margin: '0 auto' },
+  section: { padding: '82px 60px', maxWidth: '1060px', margin: '0 auto' },
   sectionHead: { textAlign: 'center', marginBottom: '64px' },
   label: { fontSize: '10px', letterSpacing: '0.45em', textTransform: 'uppercase', color: c.tan, marginBottom: '16px', display: 'block', fontFamily: 'system-ui, sans-serif' },
-  h2: { fontSize: 'clamp(2rem, 4vw, 3.2rem)', fontWeight: 400, fontStyle: 'italic', lineHeight: 1.1, color: c.burgundy, marginBottom: '16px' },
+  h2: { fontSize: 'clamp(2.3rem, 4vw, 3.5rem)', fontWeight: 600, fontStyle: 'italic', lineHeight: 1.04, color: c.burgundy, marginBottom: '14px' },
   dividerLine: { width: '60px', height: '1px', background: c.tan, margin: '0 auto' },
   p: { fontSize: '1rem', lineHeight: 1.9, color: c.muted, marginBottom: '18px', fontFamily: 'system-ui, sans-serif' },
   aboutGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px' },
   svcGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px', textAlign: 'center' },
   svcCard: { padding: '40px 28px', background: c.cream, borderTop: `3px solid ${c.burgundy}` },
   svcDeco: { width: '32px', height: '1px', background: c.tan, margin: '0 auto 24px' },
-  svcH: { fontSize: '1.08rem', fontStyle: 'italic', marginBottom: '16px', color: c.burgundy, lineHeight: 1.3 },
+  svcH: { fontSize: '1.2rem', fontStyle: 'italic', fontWeight: 600, marginBottom: '16px', color: c.burgundy, lineHeight: 1.2 },
   svcP: { fontSize: '0.9rem', lineHeight: 1.8, color: c.muted, fontFamily: 'system-ui, sans-serif' },
   contactBg: { background: c.cream, borderTop: `1px solid ${c.border}` },
   contactInner: { maxWidth: '1060px', margin: '0 auto', padding: '96px 60px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px' },
@@ -66,9 +67,9 @@ export default function Template4() {
       <nav style={s.nav}>
         <span style={s.navBrand} data-r>Your Company Name</span>
         <div style={s.navLinks} data-r>
-          <span>About</span>
-          <span>Services</span>
-          <span>Contact</span>
+          <a href="#about" style={s.navLink}>About</a>
+          <a href="#services" style={s.navLink}>Services</a>
+          <a href="#contact" style={s.navLink}>Contact</a>
         </div>
       </nav>
 
@@ -81,7 +82,7 @@ export default function Template4() {
         <div style={s.ornament} data-r>— ✦ —</div>
       </section>
 
-      <div style={s.section}>
+      <div id="about" style={s.section}>
         <div style={s.sectionHead}>
           <span style={s.label}>About Us</span>
           <h2 style={s.h2}>A Disciplined Approach<br />to Advisory Work</h2>
@@ -93,7 +94,7 @@ export default function Template4() {
         </div>
       </div>
 
-      <div style={{ borderTop: `1px solid ${c.border}`, background: c.bg }}>
+      <div id="services" style={{ borderTop: `1px solid ${c.border}`, background: c.bg }}>
         <div style={s.section}>
           <div style={s.sectionHead}>
             <span style={s.label}>Our Services</span>

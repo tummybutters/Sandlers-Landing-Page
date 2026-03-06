@@ -16,25 +16,27 @@ const s = {
   root: { minHeight: '100vh', background: c.bg, color: c.text, fontFamily: "'Helvetica Neue', Arial, sans-serif", overflowX: 'hidden' },
   nav: { padding: '0 60px', height: '68px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${c.border}`, background: c.bg, position: 'sticky', top: 0, zIndex: 10 },
   navBrand: { fontSize: '15px', fontWeight: 800, letterSpacing: '-0.01em', color: c.navy },
+  navLinks: { display: 'flex', alignItems: 'center', gap: '28px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: c.muted },
+  navLink: { color: 'inherit', textDecoration: 'none' },
   navBtn: { padding: '9px 22px', background: c.blue, color: '#fff', fontSize: '12px', fontWeight: 600, border: 'none', cursor: 'pointer', borderRadius: '6px', textDecoration: 'none', display: 'inline-block' },
-  hero: { padding: '100px 60px', maxWidth: '1120px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '80px', alignItems: 'center', minHeight: '82vh' },
+  hero: { padding: '76px 60px 84px', maxWidth: '1120px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '64px', alignItems: 'center', minHeight: 'calc(100vh - 68px)' },
   eyebrow: { display: 'inline-block', padding: '5px 12px', background: c.blueLight, color: c.blue, fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '24px', borderRadius: '4px' },
-  h1: { fontSize: 'clamp(2.4rem, 4.5vw, 4rem)', fontWeight: 800, lineHeight: 1.05, letterSpacing: '-0.03em', marginBottom: '24px', color: c.navy },
-  heroP: { fontSize: '1.05rem', lineHeight: 1.78, color: c.muted, marginBottom: '40px' },
+  h1: { fontSize: 'clamp(2.8rem, 4.8vw, 4.4rem)', fontWeight: 800, lineHeight: 1.02, letterSpacing: '-0.04em', marginBottom: '20px', color: c.navy },
+  heroP: { fontSize: '1rem', lineHeight: 1.72, color: c.muted, marginBottom: '32px', maxWidth: '560px' },
   btnPrimary: { padding: '14px 30px', background: c.blue, color: '#fff', fontSize: '13px', fontWeight: 600, border: 'none', cursor: 'pointer', borderRadius: '6px', textDecoration: 'none', display: 'inline-block' },
   statCard: { padding: '28px 24px', background: c.bg, border: `1px solid ${c.border}`, borderRadius: '10px', borderLeft: `4px solid ${c.blue}`, marginBottom: '16px' },
   statNum: { fontSize: '2.4rem', fontWeight: 800, color: c.blue, lineHeight: 1, letterSpacing: '-0.04em' },
   statLabel: { fontSize: '13px', color: c.muted, marginTop: '6px' },
-  bgSection: { background: c.surface, padding: '100px 0' },
-  section: { padding: '100px 0' },
+  bgSection: { background: c.surface, padding: '88px 0' },
+  section: { padding: '88px 0' },
   wrap: { maxWidth: '1120px', margin: '0 auto', padding: '0 60px' },
   label: { fontSize: '11px', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: c.blue, marginBottom: '12px', display: 'block' },
-  h2: { fontSize: 'clamp(1.9rem, 3.5vw, 2.9rem)', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: '28px', color: c.navy },
+  h2: { fontSize: 'clamp(2.1rem, 3.6vw, 3.1rem)', fontWeight: 800, letterSpacing: '-0.035em', lineHeight: 1.04, marginBottom: '22px', color: c.navy },
   p: { fontSize: '1rem', lineHeight: 1.8, color: c.muted, marginBottom: '16px', maxWidth: '600px' },
   cardGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', marginTop: '48px' },
   card: { padding: '36px 28px', background: c.bg, border: `1px solid ${c.border}`, borderRadius: '10px' },
   cardBar: { width: '36px', height: '4px', background: c.blue, borderRadius: '2px', marginBottom: '22px' },
-  cardH: { fontSize: '1.1rem', fontWeight: 700, marginBottom: '12px', color: c.navy, lineHeight: 1.3 },
+  cardH: { fontSize: '1.2rem', fontWeight: 800, marginBottom: '12px', color: c.navy, lineHeight: 1.2 },
   cardP: { fontSize: '0.9rem', lineHeight: 1.75, color: c.muted },
   contactBg: { background: c.navy, padding: '100px 60px' },
   contactWrap: { maxWidth: '1120px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px' },
@@ -71,7 +73,11 @@ export default function Template2() {
     <div ref={ref} style={s.root}>
       <nav style={s.nav}>
         <span style={s.navBrand} data-r>YOUR COMPANY</span>
-        <a href="#contact" style={s.navBtn} data-r>Get Started</a>
+        <div style={s.navLinks} data-r>
+          <a href="#about" style={s.navLink}>About</a>
+          <a href="#services" style={s.navLink}>Services</a>
+          <a href="#contact" style={s.navBtn}>Contact</a>
+        </div>
       </nav>
 
       <div style={s.hero}>
@@ -91,7 +97,7 @@ export default function Template2() {
         </div>
       </div>
 
-      <div style={s.bgSection}>
+      <div id="about" style={s.bgSection}>
         <div style={s.wrap}>
           <span style={s.label}>About</span>
           <h2 style={s.h2}>Built on experience.<br />Focused on execution.</h2>
@@ -102,7 +108,7 @@ export default function Template2() {
         </div>
       </div>
 
-      <div style={s.section}>
+      <div id="services" style={s.section}>
         <div style={s.wrap}>
           <span style={s.label}>Services</span>
           <h2 style={s.h2}>What we do</h2>

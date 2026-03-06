@@ -14,25 +14,29 @@ const c = {
 
 const s = {
   root: { minHeight: '100vh', background: c.bg, color: c.text, fontFamily: "'Arial Black', 'Helvetica Neue', Arial, sans-serif", overflowX: 'hidden' },
-  hero: { background: c.green, color: '#fff', padding: '0 60px', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', paddingBottom: '80px', position: 'relative', overflow: 'hidden' },
+  nav: { padding: '0 60px', height: '72px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(20, 26, 16, 0.92)', borderBottom: `1px solid rgba(212,168,67,0.12)`, position: 'sticky', top: 0, zIndex: 10, backdropFilter: 'blur(10px)' },
+  navBrand: { fontSize: '12px', fontWeight: 900, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#fff' },
+  navLinks: { display: 'flex', gap: '28px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', fontFamily: 'Arial, sans-serif', color: 'rgba(255,255,255,0.7)' },
+  navLink: { color: 'inherit', textDecoration: 'none' },
+  hero: { background: c.green, color: '#fff', padding: '72px 60px 84px', minHeight: 'calc(100vh - 72px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative', overflow: 'hidden' },
   heroBg: { position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #1e4228 0%, #0e2014 60%, #0a1a0c 100%)', zIndex: 0 },
   heroAccent: { position: 'absolute', top: '60px', right: '60px', width: '240px', height: '240px', border: `1px solid rgba(212,168,67,0.2)`, borderRadius: '50%', zIndex: 0 },
   heroAccent2: { position: 'absolute', top: '80px', right: '80px', width: '180px', height: '180px', border: `1px solid rgba(212,168,67,0.1)`, borderRadius: '50%', zIndex: 0 },
   heroContent: { position: 'relative', zIndex: 1 },
-  heroKicker: { fontSize: '11px', fontWeight: 700, letterSpacing: '0.35em', textTransform: 'uppercase', color: c.accent, marginBottom: '20px', display: 'block' },
-  h1: { fontSize: 'clamp(3.5rem, 8vw, 8rem)', fontWeight: 900, lineHeight: 0.95, letterSpacing: '-0.04em', marginBottom: '32px', textTransform: 'uppercase' },
-  heroMeta: { display: 'flex', alignItems: 'center', gap: '40px', borderTop: `1px solid rgba(255,255,255,0.12)`, paddingTop: '32px', marginTop: '8px' },
+  heroKicker: { fontSize: '11px', fontWeight: 700, letterSpacing: '0.35em', textTransform: 'uppercase', color: c.accent, marginBottom: '18px', display: 'block' },
+  h1: { fontSize: 'clamp(3.2rem, 6.8vw, 6rem)', fontWeight: 900, lineHeight: 0.92, letterSpacing: '-0.045em', marginBottom: '24px', textTransform: 'uppercase', maxWidth: '900px' },
+  heroMeta: { display: 'flex', alignItems: 'center', gap: '32px', borderTop: `1px solid rgba(255,255,255,0.12)`, paddingTop: '26px', marginTop: '4px' },
   heroP: { fontSize: '1rem', lineHeight: 1.7, color: 'rgba(255,255,255,0.6)', maxWidth: '460px', fontFamily: 'Arial, sans-serif', fontWeight: 400 },
   btn: { padding: '14px 32px', background: c.accent, color: c.dark, fontSize: '11px', fontWeight: 800, letterSpacing: '0.2em', textTransform: 'uppercase', textDecoration: 'none', display: 'inline-block', whiteSpace: 'nowrap', flexShrink: 0 },
-  section: { padding: '96px 60px', maxWidth: '1120px', margin: '0 auto' },
+  section: { padding: '84px 60px', maxWidth: '1120px', margin: '0 auto' },
   label: { fontSize: '10px', fontWeight: 800, letterSpacing: '0.35em', textTransform: 'uppercase', color: c.greenLight, marginBottom: '16px', display: 'block' },
-  h2: { fontSize: 'clamp(2.4rem, 5vw, 4.5rem)', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 0.95, marginBottom: '40px', textTransform: 'uppercase', color: c.dark },
+  h2: { fontSize: 'clamp(2.5rem, 4.8vw, 4rem)', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 0.94, marginBottom: '28px', textTransform: 'uppercase', color: c.dark },
   p: { fontSize: '1rem', lineHeight: 1.8, color: c.muted, marginBottom: '18px', fontFamily: 'Arial, sans-serif', fontWeight: 400, maxWidth: '560px' },
   aboutGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', alignItems: 'start' },
   svcList: { marginTop: '40px', borderTop: `2px solid ${c.dark}` },
   svcItem: { display: 'grid', gridTemplateColumns: '60px 1fr auto', alignItems: 'center', gap: '32px', padding: '32px 0', borderBottom: `1px solid ${c.border}` },
   svcNum: { fontSize: '1.5rem', fontWeight: 900, color: c.accent, letterSpacing: '-0.04em' },
-  svcH: { fontSize: '1.2rem', fontWeight: 800, letterSpacing: '-0.02em', textTransform: 'uppercase', marginBottom: '8px' },
+  svcH: { fontSize: '1.28rem', fontWeight: 900, letterSpacing: '-0.02em', textTransform: 'uppercase', marginBottom: '8px' },
   svcP: { fontSize: '0.9rem', lineHeight: 1.7, color: c.muted, fontFamily: 'Arial, sans-serif', fontWeight: 400 },
   contactSection: { background: c.dark, color: '#fff', padding: '96px 60px' },
   contactWrap: { maxWidth: '1120px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px' },
@@ -61,6 +65,15 @@ export default function Template3() {
 
   return (
     <div ref={ref} style={s.root}>
+      <nav style={s.nav}>
+        <span style={s.navBrand} data-r>Your Company</span>
+        <div style={s.navLinks} data-r>
+          <a href="#about" style={s.navLink}>About</a>
+          <a href="#services" style={s.navLink}>Services</a>
+          <a href="#contact" style={s.navLink}>Contact</a>
+        </div>
+      </nav>
+
       <section style={s.hero}>
         <div style={s.heroBg} />
         <div style={s.heroAccent} />
@@ -75,7 +88,7 @@ export default function Template3() {
         </div>
       </section>
 
-      <div style={{ ...s.section, paddingBottom: '48px' }}>
+      <div id="about" style={{ ...s.section, paddingBottom: '48px' }}>
         <span style={s.label}>About</span>
         <div style={s.aboutGrid}>
           <h2 style={{ ...s.h2, marginBottom: 0 }}>Experienced<br />Advisory Support</h2>
@@ -86,7 +99,7 @@ export default function Template3() {
         </div>
       </div>
 
-      <div style={{ padding: '0 60px 96px', maxWidth: '1120px', margin: '0 auto' }}>
+      <div id="services" style={{ padding: '0 60px 96px', maxWidth: '1120px', margin: '0 auto' }}>
         <span style={s.label}>Services</span>
         <h2 style={s.h2}>What We Do</h2>
         <div style={s.svcList}>

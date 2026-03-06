@@ -73,18 +73,33 @@ textarea {
 .app-loading-state {
   min-height: 100vh;
   background:
-    radial-gradient(circle at top left, rgba(184, 148, 60, 0.12), transparent 28%),
-    #09090c;
+    radial-gradient(circle at top left, rgba(184, 148, 60, 0.14), transparent 28%),
+    #f4eee3;
 }
 
 .root-wrapper {
+  --c-bg: #f4eee3;
+  --c-surface: rgba(255, 251, 244, 0.94);
+  --c-surface-raised: #fffdf9;
+  --c-border: rgba(96, 75, 40, 0.16);
+  --c-border-mid: rgba(96, 75, 40, 0.28);
+  --c-gold: #a77a22;
+  --c-gold-bright: #bd8e31;
+  --c-gold-dim: #86611b;
+  --c-text: #1d160f;
+  --c-secondary: #4a3d31;
+  --c-muted: #67584a;
+
   position: relative;
   min-height: 100svh;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: var(--c-bg);
+  background:
+    radial-gradient(circle at top left, rgba(184, 148, 60, 0.12), transparent 24%),
+    radial-gradient(circle at bottom right, rgba(132, 106, 68, 0.08), transparent 28%),
+    var(--c-bg);
   padding: 20px;
 }
 
@@ -92,7 +107,7 @@ textarea {
   content: '';
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle, rgba(184, 148, 60, 0.07) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(167, 122, 34, 0.12) 1px, transparent 1px);
   background-size: 28px 28px;
   pointer-events: none;
   z-index: 0;
@@ -103,7 +118,7 @@ textarea {
   width: 800px;
   height: 800px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(184, 148, 60, 0.035) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(184, 148, 60, 0.08) 0%, transparent 65%);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -120,6 +135,8 @@ textarea {
   padding: 26px 30px 20px;
   background: var(--c-surface);
   border: 1px solid var(--c-border);
+  box-shadow: 0 26px 90px rgba(58, 39, 17, 0.12);
+  backdrop-filter: blur(18px);
   display: grid;
   grid-template-rows: auto auto auto minmax(0, 1fr) auto auto;
 }
@@ -131,6 +148,8 @@ textarea {
   padding: 44px 52px 40px;
   background: var(--c-surface);
   border: 1px solid var(--c-border);
+  box-shadow: 0 26px 90px rgba(58, 39, 17, 0.12);
+  backdrop-filter: blur(18px);
 }
 
 .corner {
@@ -185,7 +204,7 @@ textarea {
 }
 
 .brand-label {
-  color: var(--c-muted);
+  color: var(--c-secondary);
 }
 
 .step-counter {
@@ -200,7 +219,7 @@ textarea {
 
 .step-sep,
 .step-total {
-  color: var(--c-muted);
+  color: var(--c-secondary);
 }
 
 .progress-track {
@@ -233,13 +252,14 @@ textarea {
 .step-title {
   font-size: clamp(2rem, 4vw, 2.95rem);
   margin-bottom: 10px;
+  color: var(--c-text);
 }
 
 .step-description {
   max-width: 560px;
   font-size: 13px;
-  line-height: 1.55;
-  color: var(--c-secondary);
+  line-height: 1.6;
+  color: var(--c-text);
 }
 
 .intake-step-content {
@@ -276,7 +296,7 @@ textarea {
 }
 
 .field-label {
-  color: var(--c-muted);
+  color: var(--c-secondary);
   transition: color 0.25s;
 }
 
@@ -285,7 +305,7 @@ textarea {
 }
 
 .required-mark {
-  color: var(--c-gold-dim);
+  color: var(--c-gold);
 }
 
 .field-input {
@@ -302,6 +322,10 @@ textarea {
   caret-color: var(--c-gold);
 }
 
+.field-input:not(:placeholder-shown) {
+  color: var(--c-text);
+}
+
 .field-input:focus {
   border-bottom-color: var(--c-gold);
 }
@@ -309,6 +333,7 @@ textarea {
 .field-input::placeholder,
 .field-textarea::placeholder {
   color: var(--c-muted);
+  opacity: 1;
 }
 
 .field-textarea {
@@ -327,8 +352,12 @@ textarea {
   caret-color: var(--c-gold);
 }
 
+.field-textarea:not(:placeholder-shown) {
+  color: var(--c-text);
+}
+
 .field-textarea:focus {
-  border-color: var(--c-gold-dim);
+  border-color: var(--c-gold);
 }
 
 .radio-group {
@@ -341,13 +370,14 @@ textarea {
   padding: 9px 12px;
   border: 1px solid var(--c-border);
   color: var(--c-secondary);
+  background: rgba(255, 255, 255, 0.32);
   transition: border-color 0.3s, color 0.3s, background 0.3s;
 }
 
 .radio-option:hover,
 .radio-selected {
-  border-color: var(--c-gold-dim);
-  background: rgba(184, 148, 60, 0.08);
+  border-color: var(--c-gold);
+  background: rgba(184, 148, 60, 0.14);
   color: var(--c-text);
 }
 
@@ -367,7 +397,7 @@ textarea {
   gap: 5px;
   padding: 12px;
   border: 1px dashed var(--c-border-mid);
-  background: rgba(255, 255, 255, 0.01);
+  background: rgba(255, 255, 255, 0.44);
   color: var(--c-secondary);
 }
 
@@ -377,7 +407,7 @@ textarea {
 
 .upload-hint {
   font-size: 11px;
-  color: var(--c-muted);
+  color: var(--c-secondary);
 }
 
 .colors-step {
@@ -401,11 +431,12 @@ textarea {
   padding: 10px 12px;
   border: 1px solid var(--c-border);
   color: var(--c-secondary);
+  background: rgba(255, 255, 255, 0.4);
   transition: all 0.25s ease;
 }
 
 .color-tab-active {
-  border-color: var(--c-gold-dim);
+  border-color: var(--c-gold);
   color: var(--c-text);
 }
 
@@ -413,7 +444,7 @@ textarea {
 .color-block {
   width: 14px;
   height: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(34, 27, 18, 0.16);
 }
 
 .spectrum-picker {
@@ -474,7 +505,7 @@ textarea {
   display: flex;
   align-items: center;
   gap: 3px;
-  color: var(--c-secondary);
+  color: var(--c-text);
   letter-spacing: 0.16em;
 }
 
@@ -510,8 +541,8 @@ textarea {
 }
 
 .nav-next {
-  border: 1px solid var(--c-gold-dim);
-  background: rgba(184, 148, 60, 0.08);
+  border: 1px solid var(--c-gold);
+  background: rgba(184, 148, 60, 0.14);
   color: var(--c-text);
 }
 
@@ -528,13 +559,14 @@ textarea {
   font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--c-muted);
+  color: var(--c-secondary);
 }
 
 .enter-key {
   padding: 3px 6px;
   border: 1px solid var(--c-border-mid);
-  color: var(--c-secondary);
+  background: rgba(255, 255, 255, 0.52);
+  color: var(--c-text);
 }
 
 .success-card {
@@ -602,7 +634,7 @@ textarea {
 }
 
 .template-card:hover {
-  border-color: var(--c-border-mid);
+  border-color: var(--c-gold-dim);
 }
 
 .template-selected {
@@ -652,6 +684,7 @@ textarea {
   justify-content: space-between;
   padding: 8px 10px;
   border-top: 1px solid var(--c-border);
+  background: rgba(255, 255, 255, 0.44);
 }
 
 .template-name {
@@ -666,7 +699,7 @@ textarea {
 .template-desc {
   font-size: 9px;
   letter-spacing: 0.12em;
-  color: var(--c-muted);
+  color: var(--c-secondary);
   display: block;
   margin-top: 2px;
 }
