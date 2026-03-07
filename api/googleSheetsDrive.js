@@ -34,6 +34,19 @@ export const SHEET_HEADERS = [
   'website_json',
 ];
 
+function isPermissionError(error) {
+  const status = error?.code || error?.status || error?.response?.status;
+  return status === 401 || status === 403;
+}
+
+function formatGoogleAccessError(resourceLabel, env, error) {
+  const serviceAccount = env.GOOGLE_SERVICE_ACCOUNT_EMAIL || 'the configured Google service account';
+  return new Error(
+    `${resourceLabel} access denied for ${serviceAccount}. Share the ${resourceLabel.toLowerCase()} with that service account and make sure the Google API is enabled.`,
+    { cause: error instanceof Error ? error : undefined },
+  );
+}
+
 function getGoogleAuth(env) {
   const clientEmail = env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
   const privateKey = env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n');
@@ -145,18 +158,28 @@ export async function uploadLogoToDrive(logo, submissionId, env) {
     ? `${submissionId}-logo.${extension}`
     : `${submissionId}-logo`;
 
-  const response = await drive.files.create({
-    requestBody: {
-      name: safeName,
-      parents: [folderId],
-      mimeType: logo.mimeType || 'application/octet-stream',
-    },
-    media: {
-      mimeType: logo.mimeType || 'application/octet-stream',
-      body: Buffer.from(logo.base64, 'base64'),
-    },
-    fields: 'id, webViewLink, webContentLink, name',
-  });
+  let response;
+
+  try {
+    response = await drive.files.create({
+      requestBody: {
+        name: safeName,
+        parents: [folderId],
+        mimeType: logo.mimeType || 'application/octet-stream',
+      },
+      media: {
+        mimeType: logo.mimeType || 'application/octet-stream',
+        body: Buffer.from(logo.base64, 'base64'),
+      },
+      fields: 'id, webViewLink, webContentLink, name',
+    });
+  } catch (error) {
+    if (isPermissionError(error)) {
+      throw formatGoogleAccessError('Google Drive folder', env, error);
+    }
+
+    throw error;
+  }
 
   return {
     fileId: response.data.id || '',
@@ -176,17 +199,25 @@ export async function appendSubmissionToSheet(submission, env) {
   const auth = getGoogleAuth(env);
   const sheets = google.sheets({ version: 'v4', auth });
 
-  await ensureSheetHeaders(sheets, spreadsheetId, sheetName);
+  try {
+    await ensureSheetHeaders(sheets, spreadsheetId, sheetName);
 
-  await sheets.spreadsheets.values.append({
-    spreadsheetId,
-    range: getSheetRange(sheetName),
-    valueInputOption: 'RAW',
-    insertDataOption: 'INSERT_ROWS',
-    requestBody: {
-      values: [buildRowValues(submission)],
-    },
-  });
+    await sheets.spreadsheets.values.append({
+      spreadsheetId,
+      range: getSheetRange(sheetName),
+      valueInputOption: 'RAW',
+      insertDataOption: 'INSERT_ROWS',
+      requestBody: {
+        values: [buildRowValues(submission)],
+      },
+    });
+  } catch (error) {
+    if (isPermissionError(error)) {
+      throw formatGoogleAccessError('Google Sheet', env, error);
+    }
+
+    throw error;
+  }
 }
 
 export async function updateSubmissionFromStripe(checkoutSession, env) {

@@ -78,6 +78,24 @@ function getTemplateById(templateId) {
   return TEMPLATES.find((template) => template.id === templateId) || null;
 }
 
+async function extractApiError(response) {
+  const contentType = response.headers.get('content-type') || '';
+
+  if (contentType.includes('application/json')) {
+    const data = await response.json().catch(() => null);
+    if (data?.error) {
+      return data.error;
+    }
+  } else {
+    const text = await response.text().catch(() => '');
+    if (text) {
+      return text;
+    }
+  }
+
+  return `Webhook responded with ${response.status}`;
+}
+
 function TemplateStep({ formData, updateFormData }) {
   return (
     <div className="template-grid">
@@ -310,7 +328,8 @@ export default function IntakeApp() {
         });
 
         if (!response.ok) {
-          throw new Error(`Webhook responded with ${response.status}`);
+          const apiError = await extractApiError(response);
+          throw new Error(apiError);
         }
 
         const result = await response.json();
@@ -346,7 +365,11 @@ export default function IntakeApp() {
       window.location.href = result.checkoutUrl;
     } catch (error) {
       console.error('Intake submit failed:', error);
-      setSubmitError('Could not submit your details right now. Please check your connection and try again.');
+      setSubmitError(
+        error instanceof Error && error.message
+          ? error.message
+          : 'Could not submit your details right now. Please check your connection and try again.',
+      );
       setLoading(false);
     }
   };
