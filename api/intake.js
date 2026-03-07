@@ -13,6 +13,18 @@ async function readJsonBody(req) {
   return raw ? JSON.parse(raw) : {};
 }
 
+function getRequestOrigin(req) {
+  const forwardedProto = req.headers['x-forwarded-proto'];
+  const host = req.headers['x-forwarded-host'] || req.headers.host;
+
+  if (!host) {
+    return '';
+  }
+
+  const proto = forwardedProto || (host.includes('localhost') ? 'http' : 'https');
+  return `${proto}://${host}`;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -20,11 +32,27 @@ export default async function handler(req, res) {
 
   try {
     const body = await readJsonBody(req);
-    const result = await processIntakeSubmission(body, process.env);
+    const result = await processIntakeSubmission(body, {
+      ...process.env,
+      REQUEST_ORIGIN: getRequestOrigin(req),
+    });
     return res.status(result.status).json(result.payload);
   } catch (error) {
-    return res.status(500).json({
-      error: error instanceof Error ? error.message : 'Failed to process intake submission',
+    const status = error instanceof SyntaxError ? 400 : 500;
+    const message =
+      error instanceof SyntaxError
+        ? 'Request body must be valid JSON'
+        : error instanceof Error
+          ? error.message
+          : 'Failed to process intake submission';
+
+    console.error('POST /api/intake failed', {
+      message,
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+
+    return res.status(status).json({
+      error: message,
     });
   }
 }

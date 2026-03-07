@@ -5,8 +5,49 @@ function cloneSubmission(body) {
   return JSON.parse(JSON.stringify(body || {}));
 }
 
-export async function processIntakeSubmission(body, env) {
+function ensureObject(value) {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+}
+
+function normalizeSubmission(body) {
   const submission = cloneSubmission(body);
+
+  submission.customer = ensureObject(submission.customer);
+  submission.website = ensureObject(submission.website);
+  submission.assets = ensureObject(submission.assets);
+  submission.assets.logo = ensureObject(submission.assets.logo);
+  submission.assets.logo.storage = ensureObject(submission.assets.logo.storage);
+  submission.stripe = ensureObject(submission.stripe);
+  submission.rawIntake = ensureObject(submission.rawIntake);
+
+  submission.website.domains = Array.isArray(submission.website.domains)
+    ? submission.website.domains.filter(Boolean)
+    : [];
+
+  submission.website.template =
+    submission.website.template && typeof submission.website.template === 'object'
+      ? submission.website.template
+      : null;
+
+  submission.assets.logo = {
+    provided: Boolean(submission.assets.logo.provided),
+    fileName: submission.assets.logo.fileName || '',
+    mimeType: submission.assets.logo.mimeType || '',
+    sizeBytes: Number(submission.assets.logo.sizeBytes || 0),
+    base64: submission.assets.logo.base64 || '',
+    storage: {
+      provider: submission.assets.logo.storage.provider || 'google_drive',
+      fileId: submission.assets.logo.storage.fileId || '',
+      fileName: submission.assets.logo.storage.fileName || submission.assets.logo.fileName || '',
+      url: submission.assets.logo.storage.url || '',
+    },
+  };
+
+  return submission;
+}
+
+export async function processIntakeSubmission(body, env) {
+  const submission = normalizeSubmission(body);
 
   if (!submission.submissionId) {
     return {

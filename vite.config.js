@@ -26,12 +26,31 @@ export default defineConfig(({ mode }) => {
             })
 
             req.on('end', async () => {
-              const parsedBody = body ? JSON.parse(body) : {}
-              const result = await processIntakeSubmission(parsedBody, env)
+              try {
+                const requestEnv = {
+                  ...env,
+                  REQUEST_ORIGIN: `http://${req.headers.host || 'localhost:5173'}`,
+                }
+                const parsedBody = body ? JSON.parse(body) : {}
+                const result = await processIntakeSubmission(parsedBody, requestEnv)
 
-              res.statusCode = result.status
-              res.setHeader('Content-Type', 'application/json')
-              res.end(JSON.stringify(result.payload))
+                res.statusCode = result.status
+                res.setHeader('Content-Type', 'application/json')
+                res.end(JSON.stringify(result.payload))
+              } catch (error) {
+                res.statusCode = error instanceof SyntaxError ? 400 : 500
+                res.setHeader('Content-Type', 'application/json')
+                res.end(
+                  JSON.stringify({
+                    error:
+                      error instanceof SyntaxError
+                        ? 'Request body must be valid JSON'
+                        : error instanceof Error
+                          ? error.message
+                          : 'Failed to process intake submission',
+                  }),
+                )
+              }
             })
           })
         },

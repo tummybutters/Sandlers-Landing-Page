@@ -4,10 +4,11 @@ function normalizeBaseUrl(env) {
   const raw =
     env.BASE_URL ||
     env.APP_URL ||
+    env.REQUEST_ORIGIN ||
     (env.VERCEL_URL ? `https://${env.VERCEL_URL}` : '');
 
   if (!raw) {
-    throw new Error('BASE_URL is not configured');
+    throw new Error('BASE_URL is not configured and request origin could not be determined');
   }
 
   return raw.endsWith('/') ? raw.slice(0, -1) : raw;
