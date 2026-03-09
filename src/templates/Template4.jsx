@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import useViewport from './useViewport';
 
 const c = {
   bg: '#faf5ee',
@@ -52,6 +53,10 @@ const SERVICES = [
 
 export default function Template4() {
   const ref = useRef(null);
+  const { isMobile, isTablet } = useViewport();
+  const padX = isMobile ? 20 : isTablet ? 32 : 60;
+  const navPadY = isMobile ? 16 : 0;
+  const sectionPad = isMobile ? 60 : isTablet ? 72 : 82;
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -64,16 +69,16 @@ export default function Template4() {
 
   return (
     <div ref={ref} style={s.root}>
-      <nav style={s.nav}>
+      <nav style={{ ...s.nav, padding: `${navPadY}px ${padX}px`, height: isMobile ? 'auto' : s.nav.height, flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : s.nav.alignItems, gap: isMobile ? '14px' : 0 }}>
         <span style={s.navBrand} data-r>Your Company Name</span>
-        <div style={s.navLinks} data-r>
+        <div style={{ ...s.navLinks, width: isMobile ? '100%' : 'auto', gap: isMobile ? '16px' : s.navLinks.gap, flexWrap: isMobile ? 'wrap' : 'nowrap' }} data-r>
           <a href="#about" style={s.navLink}>About</a>
           <a href="#services" style={s.navLink}>Services</a>
           <a href="#contact" style={s.navLink}>Contact</a>
         </div>
       </nav>
 
-      <section style={s.hero}>
+      <section style={{ ...s.hero, padding: `${isMobile ? 56 : 86}px ${padX}px ${isMobile ? 64 : 94}px` }}>
         <span style={s.heroBadge} data-r>Capital & Advisory</span>
         <div style={s.heroDeco} data-r />
         <h1 style={s.h1} data-r>Measured Advisory Support<br />for Complex Mandates</h1>
@@ -82,26 +87,26 @@ export default function Template4() {
         <div style={s.ornament} data-r>— ✦ —</div>
       </section>
 
-      <div id="about" style={s.section}>
-        <div style={s.sectionHead}>
+      <div id="about" style={{ ...s.section, padding: `${sectionPad}px ${padX}px` }}>
+        <div style={{ ...s.sectionHead, marginBottom: isMobile ? '40px' : s.sectionHead.marginBottom }}>
           <span style={s.label}>About Us</span>
           <h2 style={s.h2}>A Disciplined Approach<br />to Advisory Work</h2>
           <div style={s.dividerLine} />
         </div>
-        <div style={s.aboutGrid}>
+        <div style={{ ...s.aboutGrid, gridTemplateColumns: isTablet ? '1fr' : s.aboutGrid.gridTemplateColumns, gap: isTablet ? '16px' : s.aboutGrid.gap }}>
           <p style={s.p}>Provides strategic consulting and operational advisory services to builders, developers, and real estate investors with a focus on thoughtful planning, active oversight, and practical business support.</p>
           <p style={s.p}>Engagements may span development planning, project oversight, and business management consulting for clients seeking experienced perspective across complex initiatives and ongoing operations.</p>
         </div>
       </div>
 
       <div id="services" style={{ borderTop: `1px solid ${c.border}`, background: c.bg }}>
-        <div style={s.section}>
-          <div style={s.sectionHead}>
+        <div style={{ ...s.section, padding: `${sectionPad}px ${padX}px` }}>
+          <div style={{ ...s.sectionHead, marginBottom: isMobile ? '40px' : s.sectionHead.marginBottom }}>
             <span style={s.label}>Our Services</span>
             <h2 style={s.h2}>What We Offer</h2>
             <div style={s.dividerLine} />
           </div>
-          <div style={s.svcGrid}>
+          <div style={{ ...s.svcGrid, gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : s.svcGrid.gridTemplateColumns, gap: isMobile ? '20px' : s.svcGrid.gap }}>
             {SERVICES.map(([h, p]) => (
               <div key={h} style={s.svcCard}>
                 <div style={s.svcDeco} />
@@ -114,7 +119,7 @@ export default function Template4() {
       </div>
 
       <div id="contact" style={s.contactBg}>
-        <div style={s.contactInner}>
+        <div style={{ ...s.contactInner, padding: `${isMobile ? 64 : 96}px ${padX}px`, gridTemplateColumns: isTablet ? '1fr' : s.contactInner.gridTemplateColumns, gap: isTablet ? '40px' : s.contactInner.gap }}>
           <div>
             <span style={s.label}>Contact Us</span>
             <h2 style={s.h2}>We'd Love to<br />Hear From You</h2>
@@ -135,7 +140,7 @@ export default function Template4() {
         </div>
       </div>
 
-      <div style={s.footer}>
+      <div style={{ ...s.footer, padding: `22px ${padX}px`, flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? '10px' : 0, alignItems: isMobile ? 'flex-start' : 'center' }}>
         <span>© 2026 Your Company Name. All rights reserved.</span>
         <span>Privacy Policy</span>
       </div>

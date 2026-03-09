@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import useViewport from './useViewport';
 
 const c = {
   bg: '#f0ece4',
@@ -53,6 +54,10 @@ const SERVICES = [
 
 export default function Template3() {
   const ref = useRef(null);
+  const { isMobile, isTablet } = useViewport();
+  const padX = isMobile ? 20 : isTablet ? 32 : 60;
+  const navPadY = isMobile ? 16 : 0;
+  const sectionPad = isMobile ? 60 : isTablet ? 72 : 84;
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -65,32 +70,32 @@ export default function Template3() {
 
   return (
     <div ref={ref} style={s.root}>
-      <nav style={s.nav}>
+      <nav style={{ ...s.nav, padding: `${navPadY}px ${padX}px`, height: isMobile ? 'auto' : s.nav.height, flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : s.nav.alignItems, gap: isMobile ? '14px' : 0 }}>
         <span style={s.navBrand} data-r>Your Company</span>
-        <div style={s.navLinks} data-r>
+        <div style={{ ...s.navLinks, width: isMobile ? '100%' : 'auto', gap: isMobile ? '16px' : s.navLinks.gap, flexWrap: isMobile ? 'wrap' : 'nowrap' }} data-r>
           <a href="#about" style={s.navLink}>About</a>
           <a href="#services" style={s.navLink}>Services</a>
           <a href="#contact" style={s.navLink}>Contact</a>
         </div>
       </nav>
 
-      <section style={s.hero}>
+      <section style={{ ...s.hero, padding: `${isMobile ? 56 : 72}px ${padX}px ${isMobile ? 64 : 84}px`, minHeight: isTablet ? 'auto' : s.hero.minHeight }}>
         <div style={s.heroBg} />
-        <div style={s.heroAccent} />
-        <div style={s.heroAccent2} />
+        {!isMobile && <div style={{ ...s.heroAccent, top: isTablet ? '36px' : s.heroAccent.top, right: isTablet ? '32px' : s.heroAccent.right }} />}
+        {!isMobile && <div style={{ ...s.heroAccent2, top: isTablet ? '56px' : s.heroAccent2.top, right: isTablet ? '52px' : s.heroAccent2.right }} />}
         <div style={s.heroContent}>
           <span style={s.heroKicker} data-r>Capital & Advisory</span>
           <h1 style={s.h1} data-r>Guide<br />Complexity.<br />Maintain Direction.</h1>
-          <div style={s.heroMeta} data-r>
+          <div style={{ ...s.heroMeta, flexDirection: isTablet ? 'column' : 'row', alignItems: isTablet ? 'flex-start' : s.heroMeta.alignItems, gap: isTablet ? '20px' : s.heroMeta.gap }} data-r>
             <p style={s.heroP}>Provides strategic consulting and operational advisory services to builders, developers, and real estate investors, including development planning, project oversight, and business management consulting.</p>
             <a href="#contact" style={s.btn}>Start a Conversation</a>
           </div>
         </div>
       </section>
 
-      <div id="about" style={{ ...s.section, paddingBottom: '48px' }}>
+      <div id="about" style={{ ...s.section, padding: `${sectionPad}px ${padX}px 48px` }}>
         <span style={s.label}>About</span>
-        <div style={s.aboutGrid}>
+        <div style={{ ...s.aboutGrid, gridTemplateColumns: isTablet ? '1fr' : s.aboutGrid.gridTemplateColumns, gap: isTablet ? '24px' : s.aboutGrid.gap }}>
           <h2 style={{ ...s.h2, marginBottom: 0 }}>Experienced<br />Advisory Support</h2>
           <div>
             <p style={s.p}>Provides strategic consulting and operational advisory services to builders, developers, and real estate investors, with a focus on maintaining momentum across planning and execution.</p>
@@ -99,25 +104,25 @@ export default function Template3() {
         </div>
       </div>
 
-      <div id="services" style={{ padding: '0 60px 96px', maxWidth: '1120px', margin: '0 auto' }}>
+      <div id="services" style={{ padding: `0 ${padX}px ${isMobile ? 64 : 96}px`, maxWidth: '1120px', margin: '0 auto' }}>
         <span style={s.label}>Services</span>
         <h2 style={s.h2}>What We Do</h2>
         <div style={s.svcList}>
           {SERVICES.map(([h, p], i) => (
-            <div key={h} style={s.svcItem}>
+            <div key={h} style={{ ...s.svcItem, gridTemplateColumns: isMobile ? '1fr' : isTablet ? '48px 1fr' : s.svcItem.gridTemplateColumns, gap: isMobile ? '14px' : isTablet ? '20px' : s.svcItem.gap, alignItems: isMobile ? 'start' : s.svcItem.alignItems }}>
               <span style={s.svcNum}>0{i + 1}</span>
               <div>
                 <div style={s.svcH}>{h}</div>
                 <p style={s.svcP}>{p}</p>
               </div>
-              <div style={{ width: '48px', height: '48px', border: `2px solid ${c.accent}`, borderRadius: '50%', flexShrink: 0 }} />
+              {!isTablet && <div style={{ width: '48px', height: '48px', border: `2px solid ${c.accent}`, borderRadius: '50%', flexShrink: 0 }} />}
             </div>
           ))}
         </div>
       </div>
 
-      <div id="contact" style={s.contactSection}>
-        <div style={s.contactWrap}>
+      <div id="contact" style={{ ...s.contactSection, padding: `${isMobile ? 64 : 96}px ${padX}px` }}>
+        <div style={{ ...s.contactWrap, gridTemplateColumns: isTablet ? '1fr' : s.contactWrap.gridTemplateColumns, gap: isTablet ? '40px' : s.contactWrap.gap }}>
           <div>
             <span style={{ ...s.label, color: 'rgba(255,255,255,0.4)' }}>Contact</span>
             <h2 style={{ ...s.h2, color: '#fff' }}>Ready to Connect?</h2>
@@ -137,7 +142,7 @@ export default function Template3() {
         </div>
       </div>
 
-      <div style={s.footer}>
+      <div style={{ ...s.footer, padding: `20px ${padX}px`, flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? '10px' : 0, alignItems: isMobile ? 'flex-start' : 'center' }}>
         <span>© 2026 Your Company Name. All rights reserved.</span>
         <span>Privacy Policy</span>
       </div>
