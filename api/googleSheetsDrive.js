@@ -25,6 +25,15 @@ export const SHEET_HEADERS = [
   'logo_mime_type',
   'logo_blob_pathname',
   'logo_blob_url',
+  'sms_status',
+  'twilio_from_number',
+  'twilio_to_number',
+  'twilio_last_outbound_sid',
+  'twilio_last_outbound_body',
+  'twilio_last_outbound_at',
+  'twilio_last_inbound_body',
+  'twilio_last_inbound_at',
+  'sms_thread_json',
   'stripe_checkout_session_id',
   'stripe_customer_id',
   'stripe_subscription_id',
@@ -33,6 +42,19 @@ export const SHEET_HEADERS = [
   'raw_intake_json',
   'website_json',
 ];
+
+function columnNumberToLetter(columnNumber) {
+  let number = columnNumber;
+  let output = '';
+
+  while (number > 0) {
+    const remainder = (number - 1) % 26;
+    output = String.fromCharCode(65 + remainder) + output;
+    number = Math.floor((number - 1) / 26);
+  }
+
+  return output;
+}
 
 function isPermissionError(error) {
   const status = error?.code || error?.status || error?.response?.status;
@@ -75,10 +97,16 @@ function getGoogleAuth(env) {
 }
 
 function getSheetRange(sheetName) {
-  return `${sheetName}!A:AE`;
+  return `${sheetName}!A:${columnNumberToLetter(SHEET_HEADERS.length)}`;
+}
+
+function getRowRange(sheetName, rowNumber) {
+  return `${sheetName}!A${rowNumber}:${columnNumberToLetter(SHEET_HEADERS.length)}${rowNumber}`;
 }
 
 function buildRowValues(submission) {
+  const messaging = submission.messaging || {};
+
   return [
     submission.submissionId,
     submission.createdAt,
@@ -104,6 +132,15 @@ function buildRowValues(submission) {
     submission.assets.logo.mimeType || '',
     submission.assets.logo.storage.pathname || '',
     submission.assets.logo.storage.url || '',
+    messaging.status || '',
+    messaging.fromNumber || '',
+    messaging.toNumber || '',
+    messaging.lastOutboundSid || '',
+    messaging.lastOutboundBody || '',
+    messaging.lastOutboundAt || '',
+    messaging.lastInboundBody || '',
+    messaging.lastInboundAt || '',
+    JSON.stringify(Array.isArray(messaging.thread) ? messaging.thread : []),
     submission.stripe.checkoutSessionId || '',
     submission.stripe.customerId || '',
     submission.stripe.subscriptionId || '',
@@ -146,7 +183,11 @@ async function ensureSheetHeaders(sheets, spreadsheetId, sheetName) {
   });
 }
 
-export async function appendSubmissionToSheet(submission, env) {
+function createRowRecord(headerRow, row) {
+  return Object.fromEntries(headerRow.map((header, index) => [header, row[index] || '']));
+}
+
+async function getSheetsClient(env) {
   const spreadsheetId = env.GOOGLE_SHEETS_SPREADSHEET_ID;
   const sheetName = env.GOOGLE_SHEETS_SHEET_NAME || 'Submissions';
 
@@ -159,7 +200,77 @@ export async function appendSubmissionToSheet(submission, env) {
 
   try {
     await ensureSheetHeaders(sheets, spreadsheetId, sheetName);
+  } catch (error) {
+    if (isPermissionError(error)) {
+      throw formatGoogleAccessError('Google Sheet', env, error);
+    }
 
+    if (isNotFoundError(error)) {
+      throw formatGoogleNotFoundError('Google Sheet', spreadsheetId, error);
+    }
+
+    throw error;
+  }
+
+  return { spreadsheetId, sheetName, sheets };
+}
+
+async function getSheetRecords(env) {
+  const { spreadsheetId, sheetName, sheets } = await getSheetsClient(env);
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: getSheetRange(sheetName),
+  });
+
+  const rows = response.data.values || [];
+  const headerRow = rows[0] || SHEET_HEADERS;
+
+  return { spreadsheetId, sheetName, sheets, rows, headerRow };
+}
+
+function parseSmsThread(rowRecord) {
+  if (!rowRecord.sms_thread_json) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(rowRecord.sms_thread_json);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+async function updateRowRecord(env, matchRowIndex, mutateRecord) {
+  const { spreadsheetId, sheetName, sheets, rows, headerRow } = await getSheetRecords(env);
+
+  if (matchRowIndex <= 0 || matchRowIndex >= rows.length) {
+    throw new Error('Submission row could not be found');
+  }
+
+  const rowNumber = matchRowIndex + 1;
+  const rowRecord = createRowRecord(headerRow, rows[matchRowIndex]);
+  mutateRecord(rowRecord);
+  rowRecord.updated_at = new Date().toISOString();
+
+  const updatedRow = headerRow.map((header) => rowRecord[header] || '');
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId,
+    range: getRowRange(sheetName, rowNumber),
+    valueInputOption: 'RAW',
+    requestBody: {
+      values: [updatedRow],
+    },
+  });
+
+  return rowRecord;
+}
+
+export async function appendSubmissionToSheet(submission, env) {
+  const { spreadsheetId, sheetName, sheets } = await getSheetsClient(env);
+
+  try {
     await sheets.spreadsheets.values.append({
       spreadsheetId,
       range: getSheetRange(sheetName),
@@ -183,28 +294,14 @@ export async function appendSubmissionToSheet(submission, env) {
 }
 
 export async function updateSubmissionFromStripe(checkoutSession, env) {
-  const spreadsheetId = env.GOOGLE_SHEETS_SPREADSHEET_ID;
-  const sheetName = env.GOOGLE_SHEETS_SHEET_NAME || 'Submissions';
   const submissionId =
     checkoutSession.client_reference_id || checkoutSession.metadata?.submission_id || '';
-
-  if (!spreadsheetId) {
-    throw new Error('GOOGLE_SHEETS_SPREADSHEET_ID is not configured');
-  }
 
   if (!submissionId) {
     throw new Error('Stripe session is missing submission_id');
   }
 
-  const auth = getGoogleAuth(env);
-  const sheets = google.sheets({ version: 'v4', auth });
-  const response = await sheets.spreadsheets.values.get({
-    spreadsheetId,
-    range: getSheetRange(sheetName),
-  });
-
-  const rows = response.data.values || [];
-  const headerRow = rows[0] || SHEET_HEADERS;
+  const { rows, headerRow } = await getSheetRecords(env);
   const submissionIndex = headerRow.indexOf('submission_id');
   const matchedRowIndex = rows.findIndex((row, index) => index > 0 && row[submissionIndex] === submissionId);
 
@@ -212,31 +309,51 @@ export async function updateSubmissionFromStripe(checkoutSession, env) {
     throw new Error(`No submission found for ${submissionId}`);
   }
 
-  const rowNumber = matchedRowIndex + 1;
-  const existingRow = rows[matchedRowIndex];
-  const rowRecord = Object.fromEntries(
-    headerRow.map((header, index) => [header, existingRow[index] || '']),
-  );
-
-  rowRecord.updated_at = new Date().toISOString();
-  rowRecord.status = 'paid';
-  rowRecord.payment_status = 'paid';
-  rowRecord.stripe_checkout_session_id = checkoutSession.id || '';
-  rowRecord.stripe_customer_id = checkoutSession.customer || '';
-  rowRecord.stripe_subscription_id = checkoutSession.subscription || '';
-  rowRecord.stripe_payment_intent_id = checkoutSession.payment_intent || '';
-  rowRecord.paid_at = new Date().toISOString();
-
-  const updatedRow = headerRow.map((header) => rowRecord[header] || '');
-
-  await sheets.spreadsheets.values.update({
-    spreadsheetId,
-    range: `${sheetName}!A${rowNumber}:AE${rowNumber}`,
-    valueInputOption: 'RAW',
-    requestBody: {
-      values: [updatedRow],
-    },
+  await updateRowRecord(env, matchedRowIndex, (rowRecord) => {
+    rowRecord.status = 'paid';
+    rowRecord.payment_status = 'paid';
+    rowRecord.stripe_checkout_session_id = checkoutSession.id || '';
+    rowRecord.stripe_customer_id = checkoutSession.customer || '';
+    rowRecord.stripe_subscription_id = checkoutSession.subscription || '';
+    rowRecord.stripe_payment_intent_id = checkoutSession.payment_intent || '';
+    rowRecord.paid_at = new Date().toISOString();
   });
 
   return { submissionId };
+}
+
+export async function appendInboundSmsToSubmission(fromPhoneNumber, message, env) {
+  const { rows, headerRow } = await getSheetRecords(env);
+  const phoneIndex = headerRow.indexOf('phone_number');
+
+  const matchedRowIndex = [...rows.keys()]
+    .reverse()
+    .find((index) => index > 0 && rows[index][phoneIndex] === fromPhoneNumber);
+
+  if (matchedRowIndex === undefined) {
+    throw new Error(`No submission found for phone number ${fromPhoneNumber}`);
+  }
+
+  const updated = await updateRowRecord(env, matchedRowIndex, (rowRecord) => {
+    const thread = parseSmsThread(rowRecord);
+    thread.push({
+      sid: message.sid,
+      direction: 'inbound',
+      body: message.body,
+      from: message.from,
+      to: message.to,
+      at: message.receivedAt,
+      status: 'received',
+    });
+
+    rowRecord.notification_status = 'replied';
+    rowRecord.sms_status = 'replied';
+    rowRecord.twilio_from_number = rowRecord.twilio_from_number || message.to || '';
+    rowRecord.twilio_to_number = message.from || rowRecord.twilio_to_number;
+    rowRecord.twilio_last_inbound_body = message.body;
+    rowRecord.twilio_last_inbound_at = message.receivedAt;
+    rowRecord.sms_thread_json = JSON.stringify(thread);
+  });
+
+  return { submissionId: updated.submission_id };
 }
