@@ -87,8 +87,8 @@ textarea {
   --c-gold-bright: #bd8e31;
   --c-gold-dim: #86611b;
   --c-text: #1d160f;
-  --c-secondary: #4a3d31;
-  --c-muted: #67584a;
+  --c-secondary: #3f3024;
+  --c-muted: #564435;
 
   position: relative;
   min-height: 100svh;
@@ -209,7 +209,7 @@ textarea {
 
 .step-counter {
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.15em;
 }
 
@@ -257,9 +257,10 @@ textarea {
 
 .step-description {
   max-width: 560px;
-  font-size: 13px;
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.7;
   color: var(--c-text);
+  font-weight: 500;
 }
 
 .intake-step-content {
@@ -314,8 +315,8 @@ textarea {
   border: none;
   border-bottom: 1px solid var(--c-border-mid);
   background: transparent;
-  font-size: 0.98rem;
-  font-weight: 300;
+  font-size: 1rem;
+  font-weight: 500;
   color: var(--c-text);
   outline: none;
   transition: border-color 0.3s;
@@ -344,7 +345,7 @@ textarea {
   border-bottom: 1px solid var(--c-border-mid);
   background: var(--c-surface-raised);
   font-size: 1rem;
-  font-weight: 300;
+  font-weight: 500;
   line-height: 1.6;
   outline: none;
   resize: none;
@@ -371,6 +372,7 @@ textarea {
   border: 1px solid var(--c-border);
   color: var(--c-secondary);
   background: rgba(255, 255, 255, 0.32);
+  font-weight: 600;
   transition: border-color 0.3s, color 0.3s, background 0.3s;
 }
 
@@ -408,6 +410,7 @@ textarea {
 .upload-hint {
   font-size: 11px;
   color: var(--c-secondary);
+  font-weight: 500;
 }
 
 .colors-step {
@@ -432,6 +435,7 @@ textarea {
   border: 1px solid var(--c-border);
   color: var(--c-secondary);
   background: rgba(255, 255, 255, 0.4);
+  font-weight: 600;
   transition: all 0.25s ease;
 }
 
@@ -521,6 +525,7 @@ textarea {
 .nav-next {
   padding: 11px 14px;
   font-size: 11px;
+  font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   transition: opacity 0.25s, transform 0.25s, border-color 0.25s, background 0.25s;
@@ -557,6 +562,7 @@ textarea {
   right: 24px;
   bottom: 20px;
   font-size: 11px;
+  font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--c-secondary);
@@ -603,6 +609,25 @@ textarea {
 .success-fine {
   color: var(--c-secondary);
   line-height: 1.7;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .step-description {
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  .field-input,
+  .field-textarea {
+    font-size: 16px;
+  }
+
+  .field-label,
+  .step-counter,
+  .enter-hint {
+    font-weight: 700;
+  }
 }
 
 .success-contact {

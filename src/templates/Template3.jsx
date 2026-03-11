@@ -9,7 +9,7 @@ const c = {
   greenLight: '#2d6040',
   accent: '#d4a843',
   text: '#141a10',
-  muted: '#5a6152',
+  muted: '#42493d',
   border: '#d8d2c8',
 };
 
@@ -27,23 +27,23 @@ const s = {
   heroKicker: { fontSize: '11px', fontWeight: 700, letterSpacing: '0.35em', textTransform: 'uppercase', color: c.accent, marginBottom: '18px', display: 'block' },
   h1: { fontSize: 'clamp(3.2rem, 6.8vw, 6rem)', fontWeight: 900, lineHeight: 0.92, letterSpacing: '-0.045em', marginBottom: '24px', textTransform: 'uppercase', maxWidth: '900px' },
   heroMeta: { display: 'flex', alignItems: 'center', gap: '32px', borderTop: `1px solid rgba(255,255,255,0.12)`, paddingTop: '26px', marginTop: '4px' },
-  heroP: { fontSize: '1rem', lineHeight: 1.7, color: 'rgba(255,255,255,0.6)', maxWidth: '460px', fontFamily: 'Arial, sans-serif', fontWeight: 400 },
+  heroP: { fontSize: '1.06rem', lineHeight: 1.78, color: 'rgba(255,255,255,0.84)', maxWidth: '460px', fontFamily: 'Arial, sans-serif', fontWeight: 500 },
   btn: { padding: '14px 32px', background: c.accent, color: c.dark, fontSize: '11px', fontWeight: 800, letterSpacing: '0.2em', textTransform: 'uppercase', textDecoration: 'none', display: 'inline-block', whiteSpace: 'nowrap', flexShrink: 0 },
   section: { padding: '84px 60px', maxWidth: '1120px', margin: '0 auto' },
   label: { fontSize: '10px', fontWeight: 800, letterSpacing: '0.35em', textTransform: 'uppercase', color: c.greenLight, marginBottom: '16px', display: 'block' },
   h2: { fontSize: 'clamp(2.5rem, 4.8vw, 4rem)', fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 0.94, marginBottom: '28px', textTransform: 'uppercase', color: c.dark },
-  p: { fontSize: '1rem', lineHeight: 1.8, color: c.muted, marginBottom: '18px', fontFamily: 'Arial, sans-serif', fontWeight: 400, maxWidth: '560px' },
+  p: { fontSize: '1.04rem', lineHeight: 1.84, color: c.muted, marginBottom: '18px', fontFamily: 'Arial, sans-serif', fontWeight: 500, maxWidth: '560px' },
   aboutGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', alignItems: 'start' },
   svcList: { marginTop: '40px', borderTop: `2px solid ${c.dark}` },
   svcItem: { display: 'grid', gridTemplateColumns: '60px 1fr auto', alignItems: 'center', gap: '32px', padding: '32px 0', borderBottom: `1px solid ${c.border}` },
   svcNum: { fontSize: '1.5rem', fontWeight: 900, color: c.accent, letterSpacing: '-0.04em' },
   svcH: { fontSize: '1.28rem', fontWeight: 900, letterSpacing: '-0.02em', textTransform: 'uppercase', marginBottom: '8px' },
-  svcP: { fontSize: '0.9rem', lineHeight: 1.7, color: c.muted, fontFamily: 'Arial, sans-serif', fontWeight: 400 },
+  svcP: { fontSize: '0.96rem', lineHeight: 1.78, color: c.muted, fontFamily: 'Arial, sans-serif', fontWeight: 500 },
   contactSection: { background: c.dark, color: '#fff', padding: '96px 60px' },
   contactWrap: { maxWidth: '1120px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px' },
   input: { width: '100%', padding: '14px 0', background: 'transparent', border: 'none', borderBottom: '2px solid rgba(255,255,255,0.15)', color: '#fff', fontFamily: 'inherit', fontSize: '1rem', fontWeight: 700, letterSpacing: '-0.01em', outline: 'none', display: 'block', marginBottom: '24px', boxSizing: 'border-box' },
-  textarea: { width: '100%', padding: '14px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontFamily: 'Arial, sans-serif', fontWeight: 400, fontSize: '0.95rem', outline: 'none', resize: 'none', display: 'block', marginBottom: '24px', boxSizing: 'border-box' },
-  footer: { padding: '20px 60px', borderTop: `1px solid ${c.border}`, display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: c.muted, background: c.bg },
+  textarea: { width: '100%', padding: '14px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.18)', color: '#fff', fontFamily: 'Arial, sans-serif', fontWeight: 500, fontSize: '1rem', outline: 'none', resize: 'none', display: 'block', marginBottom: '24px', boxSizing: 'border-box' },
+  footer: { padding: '20px 60px', borderTop: `1px solid ${c.border}`, display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: c.muted, background: c.bg },
 };
 
 const SERVICES = [
@@ -126,8 +126,8 @@ export default function Template3() {
           <div>
             <span style={{ ...s.label, color: 'rgba(255,255,255,0.4)' }}>Contact</span>
             <h2 style={{ ...s.h2, color: '#fff' }}>Ready to Connect?</h2>
-            <p style={{ ...s.p, color: 'rgba(255,255,255,0.55)', maxWidth: '100%' }}>Reach out to discuss a project, advisory engagement, or general inquiry. We respond to all qualified inquiries within 24 hours.</p>
-            <div style={{ marginTop: '32px', color: 'rgba(255,255,255,0.45)', fontSize: '0.9rem', lineHeight: 2.4, fontFamily: 'Arial, sans-serif' }}>
+            <p style={{ ...s.p, color: 'rgba(255,255,255,0.82)', maxWidth: '100%' }}>Reach out to discuss a project, advisory engagement, or general inquiry. We respond to all qualified inquiries within 24 hours.</p>
+            <div style={{ marginTop: '32px', color: 'rgba(255,255,255,0.78)', fontSize: '0.98rem', lineHeight: 2.2, fontFamily: 'Arial, sans-serif', fontWeight: 500 }}>
               <div>contact@yourcompany.com</div>
               <div>(000) 000-0000</div>
               <div>123 Business Ave, Your City, ST 00000</div>
