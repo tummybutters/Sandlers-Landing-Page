@@ -123,15 +123,6 @@ function TemplateStep({ formData, updateFormData }) {
               <span className="template-name">{t.name}</span>
               <span className="template-desc">{t.desc}</span>
             </div>
-            <a
-              href={t.url}
-              target="_blank"
-              rel="noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="template-open"
-            >
-              View ↗
-            </a>
           </div>
         </div>
       ))}
