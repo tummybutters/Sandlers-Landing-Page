@@ -1,0 +1,361 @@
+.nexus {
+  background: #ffffff;
+  color: #000000;
+  font-family: var(--font-space-grotesk);
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.solutions,
+.marquee,
+.proofGrid {
+  scroll-margin-top: 7rem;
+}
+
+.nexus * {
+  box-sizing: inherit;
+}
+
+.header {
+  border-bottom: 2px solid #000;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navGrid {
+  display: grid;
+  grid-template-columns: 200px 1fr 200px;
+  align-items: center;
+}
+
+.brand {
+  font-weight: 700;
+  padding: 1.5rem;
+  border-right: 2px solid #000;
+  letter-spacing: -0.05em;
+}
+
+.navItems {
+  display: flex;
+  height: 100%;
+}
+
+.navItems a {
+  padding: 1.5rem 2rem;
+  border-right: 2px solid #000;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+.navItems a:hover {
+  background: #000;
+  color: #fff;
+}
+
+.engage {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: #004de6;
+  color: #fff;
+  text-align: center;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.engage:hover {
+  background: #000;
+}
+
+.hero {
+  border-bottom: 2px solid #000;
+}
+
+.heroGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: calc(100vh - 72px);
+}
+
+.heroContent {
+  padding: 6rem;
+  border-right: 2px solid #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.heroContent h1 {
+  font-size: 5rem;
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+  margin-bottom: 2rem;
+}
+
+.heroContent p {
+  font-size: 1.25rem;
+  line-height: 1.5;
+  margin-bottom: 3rem;
+  max-width: 400px;
+  font-weight: 500;
+}
+
+.blueBtn, .blueBtnLarge {
+  background: #004de6;
+  color: #fff;
+  border: 2px solid #000;
+  padding: 1rem 2rem;
+  font-family: var(--font-space-grotesk);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: fit-content;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 4px 4px 0px #000;
+  transition: all 0.2s;
+}
+
+.blueBtn:hover, .blueBtnLarge:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #000;
+}
+
+.heroVisual {
+  position: relative;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.heroVisual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(100%) contrast(1.2);
+}
+
+.gridPattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: linear-gradient(#000 1px, transparent 1px),
+                    linear-gradient(90deg, #000 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.1;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.solutions {
+  border-bottom: 2px solid #000;
+}
+
+.solutionHeader {
+  border-bottom: 2px solid #000;
+  padding: 2rem 6rem;
+}
+
+.solutionHeader h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.solutionGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.solCard {
+  padding: 4rem;
+  border-right: 2px solid #000;
+}
+
+.solCard:last-child {
+  border-right: none;
+}
+
+.solIcon {
+  color: #004de6;
+  margin-bottom: 2rem;
+}
+
+.solCard h3 {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 1.5rem;
+}
+
+.solCard p {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.marquee {
+  background: #004de6;
+  color: #fff;
+  padding: 1.5rem 0;
+  overflow: hidden;
+  border-bottom: 2px solid #000;
+  white-space: nowrap;
+}
+
+.marqueeInner {
+  display: inline-block;
+  animation: scroll 20s linear infinite;
+  font-weight: 700;
+  font-size: 2rem;
+  letter-spacing: -0.02em;
+}
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.proofGrid {
+  border-bottom: 2px solid #000;
+}
+
+.proofHeader {
+  border-bottom: 2px solid #000;
+  padding: 2rem 6rem;
+}
+
+.proofHeader h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.metricsContainer {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.metricCard {
+  padding: 4rem;
+  border-right: 2px solid #000;
+  display: flex;
+  flex-direction: column;
+}
+
+.metricCard:last-child {
+  border-right: none;
+}
+
+.metricVal {
+  font-size: 4rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  letter-spacing: -0.05em;
+  color: #004de6;
+}
+
+.metricLabel {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.cta {
+  border-bottom: 2px solid #000;
+}
+
+.ctaGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.ctaContent {
+  padding: 6rem;
+  border-right: 2px solid #000;
+}
+
+.ctaContent h2 {
+  font-size: 4rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  letter-spacing: -0.05em;
+}
+
+.ctaContent p {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.ctaAction {
+  padding: 6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f0;
+}
+
+.blueBtnLarge {
+  font-size: 1.5rem;
+  padding: 1.5rem 3rem;
+  box-shadow: 8px 8px 0px #000;
+}
+
+.blueBtnLarge:hover {
+  transform: translate(4px, 4px);
+  box-shadow: 4px 4px 0px #000;
+}
+
+.footerGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  padding: 2rem 6rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.footerStatus {
+  text-align: center;
+  color: #111;
+}
+
+.footerLegal {
+  text-align: right;
+}
+
+@media (max-width: 1024px) {
+  .heroGrid { grid-template-columns: 1fr; }
+  .heroVisual { height: 40vh; border-top: 2px solid #000; }
+  .heroContent { border-right: none; }
+  .solutionGrid { grid-template-columns: 1fr; }
+  .solCard { border-right: none; border-bottom: 2px solid #000; }
+  .solCard:last-child { border-bottom: none; }
+  .metricsContainer { grid-template-columns: 1fr 1fr; }
+  .metricCard { border-bottom: 2px solid #000; }
+  .ctaGrid { grid-template-columns: 1fr; }
+  .ctaContent { border-right: none; border-bottom: 2px solid #000; }
+}
+
+@media (max-width: 768px) {
+  .navGrid { display: flex; justify-content: space-between; padding: 0 1rem; }
+  .navItems, .engage { display: none; }
+  .brand { border: none; padding: 1rem 0; }
+  .heroContent { padding: 3rem 1rem; }
+  .heroContent h1 { font-size: 3.5rem; }
+  .metricsContainer { grid-template-columns: 1fr; }
+  .metricCard { border-right: none !important; }
+  .solutionHeader, .proofHeader { padding: 2rem 1rem; }
+  .footerGrid { grid-template-columns: 1fr; gap: 1rem; padding: 2rem 1rem; text-align: left; }
+  .footerStatus, .footerLegal { text-align: left; }
+}

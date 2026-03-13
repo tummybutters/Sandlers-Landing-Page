@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Check, Upload } from 'lucide-react';
+import { templateRegistry } from '../templateStudio/templateRegistry';
 
 const INTAKE_API_URL = '/api/intake';
 const INTAKE_TIMEOUT_MS = 5000;
@@ -46,12 +47,12 @@ function SuccessPage() {
   );
 }
 
-const TEMPLATES = [
-  { id: '1', name: 'Option 1', desc: 'Website preview', url: '/preview/1' },
-  { id: '2', name: 'Option 2', desc: 'Website preview', url: '/preview/2' },
-  { id: '3', name: 'Option 3', desc: 'Website preview', url: '/preview/3' },
-  { id: '4', name: 'Option 4', desc: 'Website preview', url: '/preview/4' },
-];
+const TEMPLATES = templateRegistry.map((template) => ({
+  id: template.id,
+  name: template.label,
+  desc: template.tone,
+  url: `/preview/${template.id}`,
+}));
 
 function createSubmissionId() {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
