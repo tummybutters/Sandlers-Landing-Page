@@ -4,6 +4,7 @@
   font-family: var(--font-inter);
   min-height: 100vh;
   text-transform: uppercase;
+  overflow-x: hidden;
 }
 
 .section,
@@ -333,10 +334,21 @@
   .massiveText { font-size: 3.4rem; }
   .hero { padding: 4.5rem 1.5rem 2rem; min-height: auto; }
   .heroSub { flex-direction: column; align-items: flex-start; gap: 2rem; }
+  .heroSub p,
+  .colLabel,
+  .colLabelDark,
+  .metricLabel {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
   .heroFrame { padding: 0.75rem; }
   .section, .sectionDark, .cta { padding: 4rem 1.5rem; }
   .serviceItem h2 { font-size: 2rem; }
+  .metricVal { font-size: 4.25rem; }
   .ctaBox { padding: 4rem 1.5rem; }
-  .ctaBox h2 { font-size: 3rem; }
+  .ctaBox h2 {
+    font-size: clamp(2.35rem, 12vw, 3rem);
+    word-break: break-word;
+  }
   .footerFlex { flex-direction: column; gap: 1rem; }
 }

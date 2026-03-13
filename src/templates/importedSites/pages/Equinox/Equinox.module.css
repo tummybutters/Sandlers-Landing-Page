@@ -399,8 +399,7 @@ h1, h2, h3, .logo, .largeText, .brandBadge {
   }
 
   .heroEyebrow {
-    margin-bottom: 0.9rem;
-    font-size: 0.72rem;
+    display: none;
   }
 
   .heroContent h1 {
@@ -420,6 +419,7 @@ h1, h2, h3, .logo, .largeText, .brandBadge {
 @media (max-width: 768px) {
   .nav { padding: 1.5rem 2rem; }
   .navItems { display: none; }
+  .contactBtn { display: none; }
   .hero { padding: 9rem 2rem 3rem; }
   .heroContent { padding-left: 0; padding-top: 1.5rem; padding-bottom: 3rem; max-width: 100%; transform: none; }
   .heroContent h1 { font-size: 3.2rem; }
@@ -430,4 +430,13 @@ h1, h2, h3, .logo, .largeText, .brandBadge {
   .cta h2 { font-size: 3rem; }
   .heroImageWrapper { top: 0; left: 0; right: 0; bottom: 0; border-radius: 0; }
   .hero::after { inset: 0; border-radius: 0; }
+  .footerContent,
+  .footerLinks {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .footerLinks {
+    gap: 0.75rem;
+    overflow-wrap: anywhere;
+  }
 }

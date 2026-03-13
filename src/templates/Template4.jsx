@@ -18,10 +18,16 @@ const templateStyles = `
     color: var(--ink);
     background: var(--paper);
     font-family: "Avenir Next", "Segoe UI", sans-serif;
+    overflow-x: hidden;
   }
 
   .template4 * {
     box-sizing: border-box;
+  }
+
+  .template4 img {
+    display: block;
+    max-width: 100%;
   }
 
   .template4 a {

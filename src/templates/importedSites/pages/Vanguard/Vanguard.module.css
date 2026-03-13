@@ -492,12 +492,29 @@
 @media (max-width: 768px) {
   .navbar { padding: 1.5rem; }
   .menu { display: none; }
+  .actionBtn { display: none; }
   .hero {
     padding: 6rem 1.5rem 3rem;
     flex-direction: column;
     align-items: flex-start;
   }
-  .heroInner h1 { font-size: 3.5rem; }
+  .heroInner {
+    width: 100%;
+    max-width: 100%;
+  }
+  .heroInner h1 {
+    font-size: clamp(2.8rem, 11vw, 3.5rem);
+    max-width: 100%;
+  }
+  .heroSub {
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .heroSub p {
+    max-width: 100%;
+    font-size: 1.05rem;
+  }
+  .scrollLine { display: none; }
   .abstractGraphic {
     position: relative;
     right: auto;
@@ -507,6 +524,11 @@
     height: 22rem;
     margin-top: 2.5rem;
   }
+  .orb {
+    width: min(72vw, 320px);
+    height: min(72vw, 320px);
+  }
+  .gridPlane { display: none; }
   .vectors, .protocol, .outcomes, .cta { padding: 4rem 1.5rem; }
   .footer { flex-direction: column; gap: 1rem; padding: 2rem 1.5rem; }
 }

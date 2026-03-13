@@ -1,0 +1,60 @@
+- generic [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e5]: Equinox Partners
+    - generic [ref=e6]:
+      - link "Vision" [ref=e7] [cursor=pointer]:
+        - /url: "#vision"
+      - link "Domains" [ref=e8] [cursor=pointer]:
+        - /url: "#domains"
+      - link "Impact" [ref=e9] [cursor=pointer]:
+        - /url: "#impact"
+    - link "Start the dialogue" [ref=e10] [cursor=pointer]:
+      - /url: mailto:hello@equinoxpartners.com
+  - generic [ref=e13]:
+    - generic [ref=e14]: Sustainability advisory
+    - heading "Organic Growth, Structured Gracefully." [level=1] [ref=e15]:
+      - generic [ref=e16]: Organic Growth,
+      - generic [ref=e17]: Structured Gracefully.
+    - paragraph [ref=e18]: We advise resilient organizations on sustainable transformation, long-horizon strategy, and operational models designed to endure.
+  - generic [ref=e20]:
+    - heading "The Philosophy" [level=2] [ref=e21]
+    - generic [ref=e22]:
+      - paragraph [ref=e23]: Growth at the expense of resilience is temporary. The strongest premium businesses are built to adapt, compound trust, and preserve long-term value.
+      - paragraph [ref=e24]: Equinox Partners helps leadership teams move away from extractive habits toward operating models that are more regenerative, credible, and durable.
+  - generic [ref=e27]:
+    - generic [ref=e28]:
+      - img [ref=e29]
+      - heading "Green Architecture" [level=3] [ref=e32]
+      - paragraph [ref=e33]: Re-engineering supply chains and operating models to reduce waste while improving resilience.
+    - generic [ref=e34]:
+      - img [ref=e35]
+      - heading "Fluid Capital" [level=3] [ref=e38]
+      - paragraph [ref=e39]: Directing investment and strategic resources toward durable, long-term value creation.
+    - generic [ref=e40]:
+      - img [ref=e41]
+      - heading "Cultural Adaptation" [level=3] [ref=e45]
+      - paragraph [ref=e46]: Helping teams evolve structure, leadership rhythm, and internal behavior without losing coherence.
+  - generic [ref=e49]:
+    - generic [ref=e50]:
+      - heading "12M+" [level=4] [ref=e51]
+      - paragraph [ref=e52]: Tons of carbon offset engineered
+    - generic [ref=e53]:
+      - heading "$6.2B" [level=4] [ref=e54]
+      - paragraph [ref=e55]: Sustainable assets under guidance
+    - generic [ref=e56]:
+      - heading "100%" [level=4] [ref=e57]
+      - paragraph [ref=e58]: Partner client retention rate
+  - generic [ref=e59]:
+    - heading "Equinox Partners" [level=2] [ref=e60]
+    - link "Schedule a dialogue" [ref=e61] [cursor=pointer]:
+      - /url: "#contact"
+      - text: Schedule a dialogue
+      - img [ref=e62]
+  - contentinfo [ref=e65]:
+    - generic [ref=e66]:
+      - generic [ref=e67]: Equinox Partners
+      - generic [ref=e68]:
+        - generic [ref=e69]: Oslo · Vancouver · Kyoto
+        - generic [ref=e70]: (206) 555-0149
+        - generic [ref=e71]: hello@equinoxpartners.com
+    - generic [ref=e72]: © 2026 Equinox Partners.
