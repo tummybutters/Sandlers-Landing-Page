@@ -14,16 +14,16 @@ const templateModules = {
 }
 
 const templateMeta = [
-  { id: '1', tone: 'Horizon' },
-  { id: '2', tone: 'Lumina' },
-  { id: '3', tone: 'Bold editorial' },
-  { id: '4', tone: 'Classic elegant' },
-  { id: '5', tone: 'Nexus' },
-  { id: '6', tone: 'Aura' },
-  { id: '7', tone: 'Veritas' },
-  { id: '8', tone: 'Onyx' },
-  { id: '9', tone: 'Equinox' },
-  { id: '10', tone: 'Vanguard' },
+  { id: '1', tone: 'Classic dark' },
+  { id: '2', tone: 'Clean editorial' },
+  { id: '3', tone: 'Bold modern' },
+  { id: '4', tone: 'Light professional' },
+  { id: '5', tone: 'Structured corporate' },
+  { id: '6', tone: 'Minimal premium' },
+  { id: '7', tone: 'Traditional luxury' },
+  { id: '8', tone: 'High-contrast modern' },
+  { id: '9', tone: 'Soft contemporary' },
+  { id: '10', tone: 'Sharp executive' },
 ]
 
 export const templateRegistry = templateMeta.map((template) => ({

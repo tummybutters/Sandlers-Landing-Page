@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Check, Upload } from 'lucide-react';
+import { Check, Upload, X } from 'lucide-react';
 import { templateRegistry } from '../templateStudio/templateRegistry';
 
 const INTAKE_API_URL = '/api/intake';
@@ -97,14 +97,89 @@ async function extractApiError(response) {
   return `Webhook responded with ${response.status}`;
 }
 
-function TemplateStep({ formData, updateFormData }) {
+function TemplatePreviewModal({ template, onClose }) {
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
+  if (!template) {
+    return null;
+  }
+
+  return (
+    <motion.div
+      className="template-modal-backdrop"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
+      onClick={onClose}
+    >
+      <motion.div
+        className="template-modal"
+        initial={{ opacity: 0, y: 10, scale: 0.992 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 8, scale: 0.994 }}
+        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="template-modal-header">
+          <div>
+            <span className="template-modal-kicker">Template Preview</span>
+            <h2>{template.name}</h2>
+            <p>{template.desc}</p>
+          </div>
+          <button
+            type="button"
+            className="template-modal-close"
+            onClick={onClose}
+            aria-label={`Close ${template.name} preview`}
+          >
+            <X size={16} strokeWidth={2.1} />
+          </button>
+        </div>
+
+        <div className="template-modal-frame">
+          <iframe
+            src={template.url}
+            title={`${template.name} full preview`}
+            className="template-modal-iframe"
+          />
+        </div>
+
+        <div className="template-modal-footer">
+          <span>Selected for your build</span>
+          <a href={template.url} target="_blank" rel="noreferrer">
+            Open full page
+          </a>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function TemplateStep({ formData, updateFormData, openPreview }) {
   return (
     <div className="template-grid">
       {TEMPLATES.map((t) => (
-        <div
+        <motion.button
+          type="button"
           key={t.id}
           className={`template-card${formData.templateId === t.id ? ' template-selected' : ''}`}
-          onClick={() => updateFormData('templateId', t.id)}
+          onClick={() => {
+            updateFormData('templateId', t.id);
+            openPreview(t);
+          }}
+          whileHover={{ y: -2, scale: 1.006 }}
+          whileTap={{ scale: 0.994 }}
+          transition={{ duration: 0.18, ease: 'easeOut' }}
         >
           <div className="template-preview-wrap">
             <iframe
@@ -123,8 +198,9 @@ function TemplateStep({ formData, updateFormData }) {
               <span className="template-name">{t.name}</span>
               <span className="template-desc">{t.desc}</span>
             </div>
+            <span className="template-card-hint">Preview</span>
           </div>
-        </div>
+        </motion.button>
       ))}
     </div>
   );
@@ -190,6 +266,7 @@ export default function IntakeApp() {
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [stepError, setStepError] = useState('');
+  const [previewTemplate, setPreviewTemplate] = useState(null);
   const [submissionId] = useState(() => createSubmissionId());
 
   const handleNextRef = useRef(null);
@@ -425,7 +502,11 @@ export default function IntakeApp() {
             </div>
 
             {currentStep.id === 'template' ? (
-              <TemplateStep formData={formData} updateFormData={updateFormData} />
+              <TemplateStep
+                formData={formData}
+                updateFormData={updateFormData}
+                openPreview={setPreviewTemplate}
+              />
             ) : (
               <div className="fields-container">
                 {currentStep.fields.map((field) => (
@@ -513,6 +594,15 @@ export default function IntakeApp() {
           </motion.div>
         </AnimatePresence>
       </div>
+
+      <AnimatePresence>
+        {previewTemplate ? (
+          <TemplatePreviewModal
+            template={previewTemplate}
+            onClose={() => setPreviewTemplate(null)}
+          />
+        ) : null}
+      </AnimatePresence>
 
       <div className="enter-hint">
         Press <span className="enter-key">Enter</span> to continue
