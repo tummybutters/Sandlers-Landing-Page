@@ -56,7 +56,6 @@ const Equinox = ({ data = defaultData }) => {
           />
         </div>
         <div className={styles.heroContent}>
-          <div className={styles.heroEyebrow}>{site.eyebrow}</div>
           <motion.h1
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
