@@ -1,10 +1,6 @@
 const DEFAULT_PAYMENT_CONFIRMED_SMS =
   "Hey, this is Summer from Qortana. Your payment went through and we're building your website now. I'll text you again soon with your live website link.";
 
-function isEnabled(value) {
-  return value === '1' || value === 'true';
-}
-
 export function normalizePhoneNumber(rawPhoneNumber) {
   const input = `${rawPhoneNumber || ''}`.trim();
   if (!input) {
@@ -85,10 +81,6 @@ async function sendTwilioSms(to, body, env) {
 }
 
 export async function sendPaymentConfirmedSms(checkoutSession, env) {
-  if (!isEnabled(`${env.TWILIO_PAYMENT_CONFIRMED_ENABLED || ''}`.toLowerCase())) {
-    return null;
-  }
-
   const to =
     checkoutSession.customer_details?.phone ||
     checkoutSession.metadata?.phone_number ||

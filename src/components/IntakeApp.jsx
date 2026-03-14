@@ -35,10 +35,7 @@ function SuccessPage() {
           text, and a link to your new website.
         </p>
         <p className="success-contact">
-          Questions? Reach us at{' '}
-          <a href="tel:+16025550000" className="success-phone">
-            (602) 555-0000
-          </a>
+          If you have any questions, just reach out to your Malohn Capital Rep!
         </p>
 
         <div className="success-divider" />
