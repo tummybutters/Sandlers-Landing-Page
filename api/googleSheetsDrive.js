@@ -322,6 +322,47 @@ export async function updateSubmissionFromStripe(checkoutSession, env) {
   return { submissionId };
 }
 
+export async function recordPaymentConfirmationSms(checkoutSession, smsResult, env) {
+  const submissionId =
+    checkoutSession.client_reference_id || checkoutSession.metadata?.submission_id || '';
+
+  if (!submissionId) {
+    throw new Error('Stripe session is missing submission_id');
+  }
+
+  const { rows, headerRow } = await getSheetRecords(env);
+  const submissionIndex = headerRow.indexOf('submission_id');
+  const matchedRowIndex = rows.findIndex((row, index) => index > 0 && row[submissionIndex] === submissionId);
+
+  if (matchedRowIndex === -1) {
+    throw new Error(`No submission found for ${submissionId}`);
+  }
+
+  await updateRowRecord(env, matchedRowIndex, (rowRecord) => {
+    const thread = parseSmsThread(rowRecord);
+    thread.push({
+      sid: smsResult.sid,
+      direction: 'outbound',
+      body: smsResult.body,
+      from: smsResult.from,
+      to: smsResult.to,
+      at: smsResult.sentAt,
+      status: smsResult.status,
+    });
+
+    rowRecord.notification_status = 'sent';
+    rowRecord.sms_status = smsResult.status || 'sent';
+    rowRecord.twilio_from_number = smsResult.from || rowRecord.twilio_from_number;
+    rowRecord.twilio_to_number = smsResult.to || rowRecord.twilio_to_number;
+    rowRecord.twilio_last_outbound_sid = smsResult.sid || '';
+    rowRecord.twilio_last_outbound_body = smsResult.body || '';
+    rowRecord.twilio_last_outbound_at = smsResult.sentAt || '';
+    rowRecord.sms_thread_json = JSON.stringify(thread);
+  });
+
+  return { submissionId };
+}
+
 export async function appendInboundSmsToSubmission(fromPhoneNumber, message, env) {
   const { rows, headerRow } = await getSheetRecords(env);
   const phoneIndex = headerRow.indexOf('phone_number');

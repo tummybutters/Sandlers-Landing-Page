@@ -7,6 +7,7 @@ const INTAKE_API_URL = '/api/intake';
 const INTAKE_TIMEOUT_MS = 5000;
 const INTAKE_RETRY_DELAY_MS = 400;
 const INTAKE_MAX_ATTEMPTS = 2;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function SuccessPage() {
   return (
@@ -77,6 +78,44 @@ function fileToBase64(file) {
 
 function getTemplateById(templateId) {
   return TEMPLATES.find((template) => template.id === templateId) || null;
+}
+
+function hasValue(value) {
+  if (typeof value === 'string') {
+    return value.trim().length > 0;
+  }
+
+  return Boolean(value);
+}
+
+function getDigits(value) {
+  return String(value || '').replace(/\D/g, '');
+}
+
+function getStepErrorMessage(step, formData) {
+  if (step.id === 'template' && !formData.templateId) {
+    return 'Choose a design before continuing.';
+  }
+
+  const missingField = step.fields.find((field) => field.required && !hasValue(formData[field.name]));
+  if (missingField) {
+    return `${missingField.label} is required.`;
+  }
+
+  if (step.id === 'contact') {
+    const email = String(formData.contactEmail || '').trim();
+    const phoneDigits = getDigits(formData.phoneNumber);
+
+    if (email && !EMAIL_PATTERN.test(email)) {
+      return 'Enter a valid email address.';
+    }
+
+    if (phoneDigits && phoneDigits.length < 10) {
+      return 'Enter a valid phone number.';
+    }
+  }
+
+  return '';
 }
 
 async function extractApiError(response) {
@@ -345,6 +384,12 @@ export default function IntakeApp() {
   };
 
   const handleNext = async () => {
+    const validationError = getStepErrorMessage(currentStep, formData);
+    if (validationError) {
+      setStepError(validationError);
+      return;
+    }
+
     if (!isLastStep) {
       setStepError('');
       setDirection(1);
@@ -382,6 +427,7 @@ export default function IntakeApp() {
   };
 
   const updateFormData = useCallback((name, value) => {
+    setStepError('');
     setFormData((prev) => ({ ...prev, [name]: value }));
   }, []);
 

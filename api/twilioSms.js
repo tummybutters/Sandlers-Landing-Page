@@ -1,5 +1,9 @@
-const DEFAULT_SMS_TEMPLATE =
-  "Hey, this is Summer from Qortana. We work with Malohn Capital and got your form submission. We're on it, and I'll text you again soon with your live website link.";
+const DEFAULT_PAYMENT_CONFIRMED_SMS =
+  "Hey, this is Summer from Qortana. Your payment went through and we're building your website now. I'll text you again soon with your live website link.";
+
+function isEnabled(value) {
+  return value === '1' || value === 'true';
+}
 
 export function normalizePhoneNumber(rawPhoneNumber) {
   const input = `${rawPhoneNumber || ''}`.trim();
@@ -42,10 +46,9 @@ function buildBasicAuthHeader(accountSid, authToken) {
   return `Basic ${Buffer.from(`${accountSid}:${authToken}`).toString('base64')}`;
 }
 
-export async function sendInitialIntakeSms(submission, env) {
+async function sendTwilioSms(to, body, env) {
   const { accountSid, authToken, phoneNumber: from } = getTwilioAuth(env);
-  const to = normalizePhoneNumber(submission.customer.phoneNumber);
-  const body = env.TWILIO_INTAKE_CONFIRMATION_MESSAGE || DEFAULT_SMS_TEMPLATE;
+  const normalizedTo = normalizePhoneNumber(to);
 
   const response = await fetch(
     `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
@@ -56,7 +59,7 @@ export async function sendInitialIntakeSms(submission, env) {
         'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
       },
       body: new URLSearchParams({
-        To: to,
+        To: normalizedTo,
         From: from,
         Body: body,
       }),
@@ -75,8 +78,25 @@ export async function sendInitialIntakeSms(submission, env) {
     sid: data.sid || '',
     status: data.status || 'queued',
     from,
-    to,
+    to: normalizedTo,
     body,
     sentAt: new Date().toISOString(),
   };
+}
+
+export async function sendPaymentConfirmedSms(checkoutSession, env) {
+  if (!isEnabled(`${env.TWILIO_PAYMENT_CONFIRMED_ENABLED || ''}`.toLowerCase())) {
+    return null;
+  }
+
+  const to =
+    checkoutSession.customer_details?.phone ||
+    checkoutSession.metadata?.phone_number ||
+    '';
+
+  if (!to) {
+    throw new Error('Stripe checkout session is missing a phone number for payment confirmation SMS');
+  }
+
+  return sendTwilioSms(to, DEFAULT_PAYMENT_CONFIRMED_SMS, env);
 }

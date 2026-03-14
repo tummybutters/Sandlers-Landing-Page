@@ -1,5 +1,6 @@
-import { updateSubmissionFromStripe } from './googleSheetsDrive.js';
+import { recordPaymentConfirmationSms, updateSubmissionFromStripe } from './googleSheetsDrive.js';
 import { getStripe, getStripeWebhookSecret } from './stripeCheckout.js';
+import { sendPaymentConfirmedSms } from './twilioSms.js';
 
 async function readRawBody(req) {
   const chunks = [];
@@ -7,6 +8,18 @@ async function readRawBody(req) {
     chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
   }
   return Buffer.concat(chunks);
+}
+
+function getSubmissionId(checkoutSession) {
+  return checkoutSession.client_reference_id || checkoutSession.metadata?.submission_id || '';
+}
+
+function isPaymentConfirmedEvent(event) {
+  return (
+    (event.type === 'checkout.session.completed' ||
+      event.type === 'checkout.session.async_payment_succeeded') &&
+    event.data.object?.payment_status === 'paid'
+  );
 }
 
 export default async function handler(req, res) {
@@ -25,8 +38,47 @@ export default async function handler(req, res) {
     const rawBody = await readRawBody(req);
     const event = stripe.webhooks.constructEvent(rawBody, signature, secret);
 
-    if (event.type === 'checkout.session.completed') {
-      await updateSubmissionFromStripe(event.data.object, process.env);
+    if (isPaymentConfirmedEvent(event)) {
+      try {
+        await updateSubmissionFromStripe(event.data.object, process.env);
+      } catch (error) {
+        console.error('Stripe webhook Google Sheets sync failed', {
+          eventId: event.id,
+          eventType: event.type,
+          submissionId: getSubmissionId(event.data.object),
+          checkoutSessionId: event.data.object?.id || '',
+          message: error instanceof Error ? error.message : 'Unknown webhook sync failure',
+          stack: error instanceof Error ? error.stack : undefined,
+        });
+      }
+
+      try {
+        const smsResult = await sendPaymentConfirmedSms(event.data.object, process.env);
+
+        if (smsResult) {
+          try {
+            await recordPaymentConfirmationSms(event.data.object, smsResult, process.env);
+          } catch (error) {
+            console.error('Stripe payment confirmation SMS sheet sync failed', {
+              eventId: event.id,
+              eventType: event.type,
+              submissionId: getSubmissionId(event.data.object),
+              checkoutSessionId: event.data.object?.id || '',
+              message: error instanceof Error ? error.message : 'Unknown payment confirmation SMS sheet sync failure',
+              stack: error instanceof Error ? error.stack : undefined,
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Stripe payment confirmation SMS failed', {
+          eventId: event.id,
+          eventType: event.type,
+          submissionId: getSubmissionId(event.data.object),
+          checkoutSessionId: event.data.object?.id || '',
+          message: error instanceof Error ? error.message : 'Unknown payment confirmation SMS failure',
+          stack: error instanceof Error ? error.stack : undefined,
+        });
+      }
     }
 
     return res.status(200).json({ received: true });
