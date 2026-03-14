@@ -2,12 +2,18 @@ import { recordPaymentConfirmationSms, updateSubmissionFromStripe } from './goog
 import { getStripe, getStripeWebhookSecret } from './stripeCheckout.js';
 import { sendPaymentConfirmedSms } from './twilioSms.js';
 
+const PAYMENT_CONFIRMED_SMS_DELAY_MS = 5000;
+
 async function readRawBody(req) {
   const chunks = [];
   for await (const chunk of req) {
     chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
   }
   return Buffer.concat(chunks);
+}
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function getSubmissionId(checkoutSession) {
@@ -53,6 +59,7 @@ export default async function handler(req, res) {
       }
 
       try {
+        await wait(PAYMENT_CONFIRMED_SMS_DELAY_MS);
         const smsResult = await sendPaymentConfirmedSms(event.data.object, process.env);
 
         if (smsResult) {

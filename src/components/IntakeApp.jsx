@@ -31,8 +31,8 @@ function SuccessPage() {
         <p className="success-eyebrow">Payment Confirmed</p>
         <h1 className="success-title">You&apos;re all set.</h1>
         <p className="success-body">
-          Be on the lookout. We&apos;ll reach out within the next few hours with either a call or
-          text, and a link to your new website.
+          Be on the lookout. We&apos;ll text you within 24 hours at the latest with a link to your
+          new website.
         </p>
         <p className="success-contact">
           If you have any questions, just reach out to your Malohn Capital Rep!
