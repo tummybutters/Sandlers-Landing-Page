@@ -1,5 +1,5 @@
 const DEFAULT_PAYMENT_CONFIRMED_SMS =
-  "Hey, this is Summer from Qortana. Your payment went through and we're building your website now. I'll text you again soon with your live website link.";
+  "Hey! This is Summer from Qortana Websites. We work directly with Malohn Capital and just received your payment. We’ll begin building your website now, and you can expect the next update from this number within 24 hours. If you have any questions in the meantime, please reach out to your Malohn Capital rep.";
 
 export function normalizePhoneNumber(rawPhoneNumber) {
   const input = `${rawPhoneNumber || ''}`.trim();
