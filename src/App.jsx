@@ -4,6 +4,7 @@ import { sampleSites } from './templateStudio/sampleSites';
 import { templateRegistry } from './templateStudio/templateRegistry';
 
 const IntakeApp = lazy(() => import('./components/IntakeApp'));
+const LandingPage = lazy(() => import('./components/LandingPage'));
 
 function getTemplatePreviewData(templateId) {
   return sampleSites.find((entry) => entry.data.templateId === templateId)?.data || { templateId };
@@ -13,7 +14,7 @@ function TemplatePreview({ templateId }) {
   const template = templateRegistry.find((entry) => entry.id === templateId);
 
   if (!template) {
-    return <IntakeApp />;
+    return <LandingPage />;
   }
 
   const Preview = template.component;
@@ -32,8 +33,9 @@ export default function App() {
               element={<TemplatePreview templateId={template.id} />}
             />
           ))}
-          <Route path="/" element={<IntakeApp />} />
-          <Route path="*" element={<IntakeApp />} />
+          <Route path="/intake" element={<IntakeApp />} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="*" element={<LandingPage />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

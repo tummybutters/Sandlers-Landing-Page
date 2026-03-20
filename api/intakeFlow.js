@@ -1,6 +1,4 @@
-import { uploadLogoToBlob } from './blobStorage.js';
 import { appendSubmissionToSheet } from './googleSheetsDrive.js';
-import { createCheckoutSession } from './stripeCheckout.js';
 import { normalizePhoneNumber } from './twilioSms.js';
 
 function cloneSubmission(body) {
@@ -20,45 +18,82 @@ function logNonBlockingFailure(label, error, context = {}) {
 }
 
 function normalizeSubmission(body) {
-  const submission = cloneSubmission(body);
+  const incoming = cloneSubmission(body);
+  const customer = ensureObject(incoming.customer);
+  const rawIntake = ensureObject(incoming.rawIntake);
+  const normalizedPhone = customer.phoneNumber
+    ? normalizePhoneNumber(customer.phoneNumber)
+    : '';
 
-  submission.customer = ensureObject(submission.customer);
-  submission.website = ensureObject(submission.website);
-  submission.assets = ensureObject(submission.assets);
-  submission.assets.logo = ensureObject(submission.assets.logo);
-  submission.assets.logo.storage = ensureObject(submission.assets.logo.storage);
-  submission.stripe = ensureObject(submission.stripe);
-  submission.rawIntake = ensureObject(submission.rawIntake);
-
-  submission.website.domains = Array.isArray(submission.website.domains)
-    ? submission.website.domains.filter(Boolean)
-    : [];
-
-  submission.website.template =
-    submission.website.template && typeof submission.website.template === 'object'
-      ? submission.website.template
-      : null;
-
-  submission.assets.logo = {
-    provided: Boolean(submission.assets.logo.provided),
-    fileName: submission.assets.logo.fileName || '',
-    mimeType: submission.assets.logo.mimeType || '',
-    sizeBytes: Number(submission.assets.logo.sizeBytes || 0),
-    base64: submission.assets.logo.base64 || '',
-    storage: {
-      provider: submission.assets.logo.storage.provider || 'vercel_blob',
-      pathname: submission.assets.logo.storage.pathname || '',
-      fileName: submission.assets.logo.storage.fileName || submission.assets.logo.fileName || '',
-      url: submission.assets.logo.storage.url || '',
+  return {
+    submissionId: incoming.submissionId || '',
+    createdAt: incoming.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    source: incoming.source || 'sandler_agent_intake',
+    status: 'submitted',
+    paymentStatus: 'not_applicable',
+    buildStatus: 'not_applicable',
+    domainStatus: 'not_applicable',
+    notificationStatus: 'not_started',
+    preferredContact: incoming.preferredContact || 'Email',
+    customer: {
+      fullName: customer.fullName || rawIntake.fullName || '',
+      businessName: customer.businessName || rawIntake.businessName || '',
+      contactEmail: customer.contactEmail || rawIntake.contactEmail || '',
+      phoneNumber: normalizedPhone,
+      businessAddress: customer.businessAddress || '',
+      serviceArea: customer.serviceArea || rawIntake.territory || '',
     },
+    website: {
+      domains: [],
+      template: null,
+    },
+    assets: {
+      logo: {
+        provided: false,
+        fileName: '',
+        mimeType: '',
+        sizeBytes: 0,
+        base64: '',
+        storage: {
+          provider: 'vercel_blob',
+          pathname: '',
+          fileName: '',
+          url: '',
+        },
+      },
+    },
+    stripe: {
+      checkoutSessionId: '',
+      checkoutUrl: '',
+      customerId: '',
+      subscriptionId: '',
+      paymentIntentId: '',
+      paidAt: '',
+      clientReferenceId: incoming.submissionId || '',
+      customerEmailPrefill: customer.contactEmail || rawIntake.contactEmail || '',
+    },
+    automation: {
+      buildStartedAt: null,
+      buildCompletedAt: null,
+      deployedAt: null,
+      liveAt: null,
+      textSentAt: null,
+    },
+    messaging: {
+      provider: 'twilio',
+      status: 'not_started',
+      fromNumber: '',
+      toNumber: normalizedPhone,
+      lastOutboundSid: '',
+      lastOutboundBody: '',
+      lastOutboundAt: '',
+      lastInboundBody: '',
+      lastInboundAt: '',
+      thread: [],
+    },
+    rawIntake,
   };
-
-  submission.messaging = ensureObject(submission.messaging);
-  submission.messaging.thread = Array.isArray(submission.messaging.thread)
-    ? submission.messaging.thread
-    : [];
-
-  return submission;
 }
 
 export async function processIntakeSubmission(body, env) {
@@ -71,46 +106,13 @@ export async function processIntakeSubmission(body, env) {
     };
   }
 
-  const logoUpload = await uploadLogoToBlob(submission.assets?.logo, submission.submissionId, env);
-
-  submission.assets.logo = {
-    ...submission.assets.logo,
-    base64: '',
-    storage: {
-      provider: 'vercel_blob',
-      pathname: logoUpload.pathname,
-      fileName: logoUpload.fileName,
-      url: logoUpload.url,
-    },
-  };
-
-  const checkoutSession = await createCheckoutSession(submission, env);
-
-  submission.updatedAt = new Date().toISOString();
-  submission.status = 'checkout_created';
-  submission.stripe.checkoutSessionId = checkoutSession.id;
-  submission.stripe.checkoutUrl = checkoutSession.url;
-  submission.customer.phoneNumber = normalizePhoneNumber(submission.customer.phoneNumber);
-  submission.messaging = {
-    provider: 'twilio',
-    status: 'pending',
-    fromNumber: '',
-    toNumber: submission.customer.phoneNumber,
-    lastOutboundSid: '',
-    lastOutboundBody: '',
-    lastOutboundAt: '',
-    lastInboundBody: '',
-    lastInboundAt: '',
-    thread: [],
-  };
-
   try {
     await appendSubmissionToSheet(submission, env);
   } catch (error) {
     logNonBlockingFailure('Submission sync to Google Sheets failed', error, {
       submissionId: submission.submissionId,
-      checkoutSessionId: submission.stripe.checkoutSessionId,
     });
+    throw error;
   }
 
   return {
@@ -118,9 +120,6 @@ export async function processIntakeSubmission(body, env) {
     payload: {
       ok: true,
       submissionId: submission.submissionId,
-      checkoutUrl: checkoutSession.url,
-      logoPathname: logoUpload.pathname,
-      logoUrl: logoUpload.url,
     },
   };
 }
