@@ -194,8 +194,8 @@ export default function LandingPage() {
           <div className="landing-security-callout">
             <ShieldCheck size={16} />
             <span>
-              Enterprise-Grade Privacy: Built on Nvidia Enterprise Security Architecture (NeMo) to
-              keep your deal, client, and commission data strictly yours.
+              Enterprise-Grade Privacy built on Nvidia&apos;s SOTA Security Architecture to keep
+              your deal, client, and commission data strictly yours.
             </span>
           </div>
         </motion.section>

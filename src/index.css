@@ -513,10 +513,11 @@ textarea {
 }
 
 .landing-security-callout {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 10px;
-  max-width: 820px;
+  width: fit-content;
+  max-width: calc(100% - 32px);
   margin: 28px auto 0;
   padding: 14px 18px;
   border-radius: 999px;
@@ -525,6 +526,11 @@ textarea {
   box-shadow: 0 18px 34px rgba(69, 48, 18, 0.08);
   color: #4b3c2d;
   line-height: 1.6;
+  text-align: left;
+}
+
+.landing-security-callout span {
+  white-space: nowrap;
 }
 
 .landing-section {
@@ -1266,6 +1272,10 @@ textarea {
   .landing-security-callout {
     border-radius: 26px;
     padding: 16px;
+  }
+
+  .landing-security-callout span {
+    white-space: normal;
   }
 
   .landing-section {
