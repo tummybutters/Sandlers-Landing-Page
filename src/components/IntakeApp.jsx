@@ -2,21 +2,203 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowUpRight, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import LegalLinks from './LegalLinks';
 import { QORTANA_INTAKE_STEPS, QUESTION_STEPS } from '../intake/sandlerIntakeConfig';
+import {
+  BRAND_NAME,
+  LEGAL_CONSENT_LABEL_TEXT,
+  LEGAL_VERSION,
+  SMS_CONSENT_LABEL_TEXT,
+  SMS_CONSENT_SCOPE,
+} from '../legal/legalConfig';
 
 const INTAKE_API_URL = '/api/intake';
 const INTAKE_TIMEOUT_MS = 5000;
 const INTAKE_RETRY_DELAY_MS = 400;
 const INTAKE_MAX_ATTEMPTS = 2;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const QORTANA_BOOKING_URL = String(import.meta.env.VITE_QORTANA_BOOKING_URL || '').trim();
+const DEFAULT_QORTANA_BOOKING_URL = 'https://cal.com/qortana/ai-infra-meeting';
+const QORTANA_BOOKING_URL = String(
+  import.meta.env.VITE_QORTANA_BOOKING_URL || DEFAULT_QORTANA_BOOKING_URL,
+).trim();
+const CAL_EMBED_ORIGIN = 'https://app.cal.com';
+const CAL_EMBED_NAMESPACE = 'ai-infra-meeting';
+const CAL_LINK = 'qortana/ai-infra-meeting';
+const CAL_EMBED_SCRIPT_SRC = `${CAL_EMBED_ORIGIN}/embed/embed.js`;
 
-function SuccessPage() {
+let calEmbedScriptPromise = null;
+
+function ensureCalEmbedScript() {
+  if (typeof window === 'undefined') {
+    return Promise.reject(new Error('Cal.com embed can only load in the browser.'));
+  }
+
+  if (window.Cal?.loaded) {
+    return Promise.resolve(window.Cal);
+  }
+
+  if (calEmbedScriptPromise) {
+    return calEmbedScriptPromise;
+  }
+
+  calEmbedScriptPromise = new Promise((resolve, reject) => {
+    if (!window.Cal) {
+      window.Cal = function calBootstrap() {
+        const cal = window.Cal;
+        const args = arguments;
+
+        if (!cal.loaded) {
+          cal.ns = {};
+          cal.q = cal.q || [];
+        }
+
+        if (args[0] === 'init') {
+          const namespace = args[1];
+          const api = function apiProxy() {
+            api.q.push(arguments);
+          };
+          api.q = api.q || [];
+
+          if (typeof namespace === 'string') {
+            cal.ns[namespace] = cal.ns[namespace] || api;
+            cal.ns[namespace].q.push(args);
+            cal.q.push(['initNamespace', namespace]);
+          } else {
+            cal.q.push(args);
+          }
+
+          return;
+        }
+
+        cal.q.push(args);
+      };
+      window.Cal.ns = {};
+      window.Cal.q = [];
+    }
+
+    const existingScript = document.querySelector(`script[src="${CAL_EMBED_SCRIPT_SRC}"]`);
+
+    if (existingScript) {
+      existingScript.addEventListener('load', () => resolve(window.Cal), { once: true });
+      existingScript.addEventListener(
+        'error',
+        () => reject(new Error('Failed to load Cal.com embed script.')),
+        { once: true },
+      );
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = CAL_EMBED_SCRIPT_SRC;
+    script.async = true;
+    script.onload = () => resolve(window.Cal);
+    script.onerror = () => reject(new Error('Failed to load Cal.com embed script.'));
+    document.head.appendChild(script);
+  });
+
+  return calEmbedScriptPromise;
+}
+
+function buildCalPrefill(formData, submissionId) {
+  const config = {
+    layout: 'month_view',
+    useSlotsViewOnSmallScreen: true,
+    'metadata[source]': 'qortana_company_intake',
+  };
+
+  const fullName = String(formData?.fullName || '').trim();
+  const contactEmail = String(formData?.contactEmail || '').trim();
+  const phoneNumber = String(formData?.phoneNumber || '').trim();
+  const businessName = String(formData?.businessName || '').trim();
+
+  if (fullName) config.name = fullName;
+  if (contactEmail) config.email = contactEmail;
+  if (submissionId) config['metadata[submissionId]'] = submissionId;
+  if (businessName) config['metadata[businessName]'] = businessName;
+
+  if (phoneNumber) {
+    config.location = JSON.stringify({
+      value: 'phone',
+      optionValue: phoneNumber,
+    });
+    config.attendeePhoneNumber = phoneNumber;
+  }
+
+  return config;
+}
+
+function renderRichParts(parts) {
+  return parts.map((part, index) => {
+    if (part.type === 'link') {
+      return (
+        <Link
+          key={`${part.value}-${index}`}
+          to={part.to}
+          className="inline-legal-link"
+          onClick={(event) => event.stopPropagation()}
+        >
+          {part.value}
+        </Link>
+      );
+    }
+
+    return <React.Fragment key={`${part.value}-${index}`}>{part.value}</React.Fragment>;
+  });
+}
+
+function SuccessPage({ formData, submissionId }) {
+  const embedRef = useRef(null);
+  const [calStatus, setCalStatus] = useState('loading');
+  const smsOptedIn = Boolean(formData?.smsOptIn);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    async function mountCal() {
+      try {
+        const Cal = await ensureCalEmbedScript();
+        if (!Cal || !embedRef.current) {
+          throw new Error('Cal.com did not initialize.');
+        }
+
+        Cal('init', CAL_EMBED_NAMESPACE, { origin: CAL_EMBED_ORIGIN });
+        Cal.ns[CAL_EMBED_NAMESPACE]('ui', {
+          hideEventTypeDetails: false,
+          layout: 'month_view',
+        });
+        embedRef.current.innerHTML = '';
+        Cal.ns[CAL_EMBED_NAMESPACE]('inline', {
+          elementOrSelector: embedRef.current,
+          calLink: CAL_LINK,
+          config: buildCalPrefill(formData, submissionId),
+        });
+
+        if (!isCancelled) {
+          setCalStatus('ready');
+        }
+      } catch (error) {
+        console.error('Cal embed failed to load:', error);
+        if (!isCancelled) {
+          setCalStatus('error');
+        }
+      }
+    }
+
+    mountCal();
+
+    return () => {
+      isCancelled = true;
+      if (embedRef.current) {
+        embedRef.current.innerHTML = '';
+      }
+    };
+  }, [formData, submissionId]);
+
   return (
     <div className="root-wrapper">
       <div className="ambient-glow" />
       <motion.div
-        className="success-card"
+        className="success-card success-card-booking"
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
@@ -31,33 +213,53 @@ function SuccessPage() {
         </div>
 
         <p className="success-eyebrow">Strategy Intake Submitted</p>
-        <h1 className="success-title">You&apos;re in the queue.</h1>
+        <h1 className="success-title">Book your strategy call.</h1>
         <p className="success-body">
-          Your Qortana infrastructure strategy intake is in. We&apos;ll use it to map the
+          Your intake is in and saved. The final step is choosing a time so we can review the
           workflows, systems, and approval boundaries worth discussing first.
         </p>
         <p className="success-contact">
-          The next step is locking in the call so we can walk through what should be automated,
-          what should stay behind review, and what production deployment would actually require.
+          We&apos;ve carried your contact details into the booking flow so the handoff feels
+          seamless.
+        </p>
+        <p className="success-note">
+          {smsOptedIn
+            ? `${BRAND_NAME} can use the number you opted in with for booking confirmations, reminders, rescheduling updates, and direct follow-up tied to this inquiry.`
+            : 'You did not opt in to call-related text reminders in this intake, so this handoff stays limited to the booking flow and related email coordination unless you request SMS later.'}
         </p>
 
+        <div className="success-booking-shell">
+          {calStatus === 'loading' && (
+            <div className="success-booking-loading">
+              Loading the booking calendar and carrying your details forward...
+            </div>
+          )}
+
+          <div
+            ref={embedRef}
+            className={`success-booking-embed${calStatus === 'ready' ? ' success-booking-embed-ready' : ''}`}
+          />
+
+          {calStatus === 'error' && (
+            <div className="success-pending-action">
+              The embedded calendar didn&apos;t load here, but your intake was submitted
+              successfully. Use the button below to book directly.
+            </div>
+          )}
+        </div>
+
         <div className="success-actions">
-          {QORTANA_BOOKING_URL ? (
+          {QORTANA_BOOKING_URL && calStatus !== 'ready' ? (
             <a
               href={QORTANA_BOOKING_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="success-primary-action"
             >
-              Book your strategy call
+              Open booking page
               <ArrowUpRight size={16} />
             </a>
-          ) : (
-            <div className="success-pending-action">
-              Booking link not configured yet. We&apos;ll follow up directly using the contact
-              details you sent.
-            </div>
-          )}
+          ) : null}
 
           <Link to="/" className="success-secondary-action">
             Back to homepage
@@ -68,6 +270,13 @@ function SuccessPage() {
         <p className="success-fine">
           Qortana Strategy Intake • Workflow, systems, governance, and infrastructure review
         </p>
+        <LegalLinks
+          tone="dark"
+          align="center"
+          condensed
+          showLabel={false}
+          className="success-legal-links"
+        />
       </motion.div>
     </div>
   );
@@ -100,7 +309,7 @@ function getDigits(value) {
 function getStepErrorMessage(step, formData) {
   const missingField = step.fields.find((field) => field.required && !hasValue(formData[field.name]));
   if (missingField) {
-    return `${missingField.label} is required.`;
+    return missingField.errorMessage || `${missingField.label} is required.`;
   }
 
   if (step.id === 'contact_info') {
@@ -145,8 +354,33 @@ function formatAnswerValue(value) {
   return value || '';
 }
 
+function buildConsentAudit(submittedAt, formData) {
+  const pagePath = typeof window !== 'undefined' ? window.location.pathname : '';
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+  const legalAccepted = Boolean(formData.legalAccepted);
+  const smsOptIn = Boolean(formData.smsOptIn);
+
+  return {
+    legalAccepted,
+    legalAcceptedAt: legalAccepted ? submittedAt : '',
+    legalVersion: LEGAL_VERSION,
+    legalLabel: LEGAL_CONSENT_LABEL_TEXT,
+    smsOptIn,
+    smsOptInAt: smsOptIn ? submittedAt : '',
+    smsConsentScope: SMS_CONSENT_SCOPE,
+    smsConsentLabel: SMS_CONSENT_LABEL_TEXT,
+    capture: {
+      pagePath,
+      pageUrl,
+      userAgent,
+    },
+  };
+}
+
 function buildSubmissionPayload(submissionId, formData) {
   const submittedAt = new Date().toISOString();
+  const consentAudit = buildConsentAudit(submittedAt, formData);
   const answersOrdered = QUESTION_STEPS.map((step, index) => {
     const field = step.fields[0];
 
@@ -168,7 +402,8 @@ function buildSubmissionPayload(submissionId, formData) {
     createdAt: submittedAt,
     updatedAt: submittedAt,
     source: 'qortana_company_intake',
-    preferredContact: 'Email',
+    preferredContact: consentAudit.smsOptIn ? 'Email + SMS' : 'Email',
+    consent: consentAudit,
     customer: {
       fullName: formData.fullName || '',
       businessName: formData.businessName || '',
@@ -192,6 +427,9 @@ function buildSubmissionPayload(submissionId, formData) {
       revenueBand: formData.revenueBand || '',
       aiMaturity: formData.aiMaturity || '',
       deploymentTimeline: formData.deploymentTimeline || '',
+      legalAccepted: consentAudit.legalAccepted,
+      smsOptIn: consentAudit.smsOptIn,
+      consentAudit,
       answers,
       answersOrdered,
     },
@@ -344,7 +582,7 @@ export default function IntakeApp() {
   handleNextRef.current = handleNext;
 
   if (isSubmitted) {
-    return <SuccessPage />;
+    return <SuccessPage formData={formData} submissionId={submissionId} />;
   }
 
   return (
@@ -392,52 +630,93 @@ export default function IntakeApp() {
               </div>
 
               <div className="fields-container">
-                {currentStep.fields.map((field) => (
-                  <div key={field.name} className="field-group">
-                    <label className="field-label">
-                      {field.label}
-                      {field.required && <span className="required-mark"> *</span>}
-                    </label>
+                {currentStep.fields.map((field) => {
+                  const fieldId = `field-${field.name}`;
 
-                    {field.type === 'textarea' ? (
-                      <textarea
-                        className="field-textarea"
-                        placeholder={field.placeholder}
-                        value={formData[field.name] || ''}
-                        onChange={(event) => updateFormData(field.name, event.target.value)}
-                      />
-                    ) : field.type === 'radio' || field.type === 'checkbox' ? (
-                      <div className="radio-group">
-                        {field.options.map((option) => {
-                          const isSelected = field.type === 'checkbox'
-                            ? (Array.isArray(formData[field.name]) ? formData[field.name] : []).includes(option)
-                            : formData[field.name] === option;
+                  return (
+                    <div
+                      key={field.name}
+                      className={`field-group${field.type === 'consent' ? ' field-group-consent' : ''}`}
+                    >
+                      {field.type !== 'consent' ? (
+                        <label className="field-label" htmlFor={fieldId}>
+                          {field.label}
+                          {field.required && <span className="required-mark"> *</span>}
+                        </label>
+                      ) : null}
 
-                          return (
-                            <button
-                              type="button"
-                              key={option}
-                              onClick={() => toggleChoiceValue(field.name, option, field.type === 'checkbox')}
-                              className={`radio-option${isSelected ? ' radio-selected' : ''}`}
-                              aria-pressed={isSelected}
-                            >
-                              {option}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      <input
-                        type={field.type}
-                        className="field-input"
-                        placeholder={field.placeholder}
-                        value={formData[field.name] || ''}
-                        onChange={(event) => updateFormData(field.name, event.target.value)}
-                        onKeyDown={(event) => event.key === 'Enter' && handleNext()}
-                      />
-                    )}
-                  </div>
-                ))}
+                      {field.type === 'textarea' ? (
+                        <textarea
+                          id={fieldId}
+                          className="field-textarea"
+                          placeholder={field.placeholder}
+                          value={formData[field.name] || ''}
+                          onChange={(event) => updateFormData(field.name, event.target.value)}
+                        />
+                      ) : field.type === 'radio' || field.type === 'checkbox' ? (
+                        <div className="radio-group">
+                          {field.options.map((option) => {
+                            const isSelected = field.type === 'checkbox'
+                              ? (Array.isArray(formData[field.name]) ? formData[field.name] : []).includes(option)
+                              : formData[field.name] === option;
+
+                            return (
+                              <button
+                                type="button"
+                                key={option}
+                                onClick={() => toggleChoiceValue(field.name, option, field.type === 'checkbox')}
+                                className={`radio-option${isSelected ? ' radio-selected' : ''}`}
+                                aria-pressed={isSelected}
+                              >
+                                {option}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ) : field.type === 'consent' ? (
+                        <div className="consent-field">
+                          <input
+                            id={fieldId}
+                            type="checkbox"
+                            className="consent-input"
+                            checked={Boolean(formData[field.name])}
+                            onChange={(event) => updateFormData(field.name, event.target.checked)}
+                          />
+
+                          <label htmlFor={fieldId} className="consent-box" aria-hidden="true">
+                            {formData[field.name] ? <Check size={14} strokeWidth={3} /> : null}
+                          </label>
+
+                          <div className="consent-copy">
+                            <label htmlFor={fieldId} className="consent-text">
+                              {field.labelParts ? renderRichParts(field.labelParts) : field.label}
+                            </label>
+
+                            {field.helperParts ? (
+                              <span className="field-helper field-helper-inline">
+                                {renderRichParts(field.helperParts)}
+                              </span>
+                            ) : null}
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <input
+                            id={fieldId}
+                            type={field.type}
+                            className="field-input"
+                            placeholder={field.placeholder}
+                            value={formData[field.name] || ''}
+                            onChange={(event) => updateFormData(field.name, event.target.value)}
+                            onKeyDown={(event) => event.key === 'Enter' && handleNext()}
+                          />
+
+                          {field.helperText ? <p className="field-helper">{field.helperText}</p> : null}
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -454,13 +733,21 @@ export default function IntakeApp() {
                 disabled={loading}
                 className={`nav-next${loading ? ' nav-loading' : ''}`}
               >
-                {loading ? 'Submitting...' : isLastStep ? 'Send Strategy Intake →' : 'Continue →'}
+                {loading ? 'Submitting...' : isLastStep ? 'Continue to Schedule' : 'Continue →'}
               </button>
             </div>
+            {isLastStep ? (
+              <p className="nav-fineprint">
+                By clicking “Continue to Schedule,” you submit your inquiry and, if selected
+                above, agree to the communication option(s) you chose.
+              </p>
+            ) : null}
             {stepError && <div className="checkout-error">{stepError}</div>}
             {submitError && <div className="checkout-error">{submitError}</div>}
           </motion.div>
         </AnimatePresence>
+
+        <LegalLinks tone="dark" align="center" condensed className="intake-legal-links" />
       </div>
 
       <div className="enter-hint">

@@ -1,8 +1,17 @@
-import { motion } from 'framer-motion';
-import { ArrowRight, Cable, Clock3, ServerCog, ShieldCheck } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Cable, Clock3, ServerCog, ShieldCheck } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import LegalLinks from './LegalLinks';
+import { MagneticFlightLink, RollingNavLink } from './PremiumMotionLinks';
 
 const transition = { duration: 0.75, ease: [0.22, 1, 0.36, 1] };
+
+const primaryNavItems = [
+  { href: '#deploy', label: 'Infrastructure', detail: 'Systems, guardrails, deployment' },
+  { href: '#results', label: 'Results', detail: 'Proof, metrics, outcomes' },
+  { href: '#company', label: 'Company', detail: 'How Qortana works with you' },
+];
 
 const deploymentCards = [
   {
@@ -94,31 +103,151 @@ const proofMetrics = [
 ];
 
 export default function LandingPage() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return undefined;
+
+    const originalOverflow = document.body.style.overflow;
+    const mediaQuery = window.matchMedia('(min-width: 821px)');
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    const handleViewportChange = (event) => {
+      if (event.matches) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
+
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', handleViewportChange);
+    } else {
+      mediaQuery.addListener(handleViewportChange);
+    }
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+
+      if (typeof mediaQuery.removeEventListener === 'function') {
+        mediaQuery.removeEventListener('change', handleViewportChange);
+      } else {
+        mediaQuery.removeListener(handleViewportChange);
+      }
+    };
+  }, [isMobileMenuOpen]);
+
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
+  const toggleMobileMenu = () => setIsMobileMenuOpen((isOpen) => !isOpen);
+
   return (
     <div className="company-shell">
       <div className="company-grid" />
       <div className="company-glow company-glow-left" />
       <div className="company-glow company-glow-right" />
 
-      <header className="company-header">
+      <header className={`company-header${isMobileMenuOpen ? ' company-header-menu-open' : ''}`}>
         <div className="company-header-inner">
           <Link to="/" className="company-brand" aria-label="Qortana home">
-            <span className="company-brand-mark">Q</span>
+            <span className="company-brand-mark">
+              <img src="/qortana-logo.png" alt="" className="company-brand-logo" />
+            </span>
             <span>Qortana</span>
           </Link>
 
           <nav className="company-nav" aria-label="Primary">
-            <a href="#deploy">Deployments</a>
-            <a href="#process">Process</a>
-            <a href="#fit">Fit</a>
-            <a href="#faq">FAQ</a>
+            {primaryNavItems.map((item) => (
+              <RollingNavLink key={item.href} href={item.href} label={item.label} />
+            ))}
           </nav>
 
-          <Link to="/intake" className="company-header-cta">
-            Book a strategy call
-            <ArrowRight size={16} />
-          </Link>
+          <MagneticFlightLink
+            to="/intake"
+            label="Book a strategy call"
+            variant="header"
+            className="company-header-cta"
+          />
+
+          <button
+            type="button"
+            className={`company-menu-toggle${isMobileMenuOpen ? ' is-open' : ''}`}
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="company-mobile-menu"
+            aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            onClick={toggleMobileMenu}
+          >
+            <span className="company-menu-toggle-label">{isMobileMenuOpen ? 'Close' : 'Menu'}</span>
+            <span className="company-menu-toggle-icon" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </span>
+          </button>
         </div>
+
+        <AnimatePresence>
+          {isMobileMenuOpen ? (
+            <div className="company-mobile-menu-shell">
+              <motion.button
+                type="button"
+                className="company-mobile-menu-backdrop"
+                aria-label="Close navigation menu"
+                onClick={closeMobileMenu}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.24, ease: 'easeOut' }}
+              />
+
+              <motion.div
+                id="company-mobile-menu"
+                className="company-mobile-menu-panel"
+                initial={{ opacity: 0, y: -18, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -16, scale: 0.97 }}
+                transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <div className="company-mobile-menu-intro">
+                  <span className="company-mobile-menu-kicker">Navigate</span>
+                  <p>Choose a section or jump straight into the intake.</p>
+                </div>
+
+                <nav className="company-mobile-nav" aria-label="Mobile primary">
+                  {primaryNavItems.map((item, index) => (
+                    <a
+                      key={item.href}
+                      href={item.href}
+                      className="company-mobile-nav-link"
+                      onClick={closeMobileMenu}
+                    >
+                      <span className="company-mobile-nav-index">0{index + 1}</span>
+                      <span className="company-mobile-nav-copy">
+                        <span className="company-mobile-nav-title">{item.label}</span>
+                        <span className="company-mobile-nav-detail">{item.detail}</span>
+                      </span>
+                    </a>
+                  ))}
+                </nav>
+
+                <div className="company-mobile-menu-cta-wrap">
+                  <MagneticFlightLink
+                    to="/intake"
+                    label="Book a strategy call"
+                    variant="header"
+                    className="company-mobile-menu-cta"
+                  />
+                </div>
+              </motion.div>
+            </div>
+          ) : null}
+        </AnimatePresence>
       </header>
 
       <main className="company-main">
@@ -139,15 +268,12 @@ export default function LandingPage() {
             </h1>
 
             <div className="company-hero-actions">
-              <Link to="/intake" className="company-cta-primary">
-                Book a strategy call
-                <ArrowRight size={16} />
-              </Link>
+              <MagneticFlightLink to="/intake" label="Book a strategy call" />
             </div>
           </div>
         </motion.section>
 
-        <section className="company-section">
+        <section id="company" className="company-section">
           <div className="company-section-header">
             <span className="company-section-label">Introducing Qortana</span>
             <h2>Most companies are testing AI. Very few are running it.</h2>
@@ -165,10 +291,7 @@ export default function LandingPage() {
               This isn&apos;t prompt engineering. This is production infrastructure.
             </p>
             <div className="company-section-actions">
-              <Link to="/intake" className="company-cta-primary">
-                Book a strategy call
-                <ArrowRight size={16} />
-              </Link>
+              <MagneticFlightLink to="/intake" label="Book a strategy call" />
             </div>
           </div>
         </section>
@@ -247,7 +370,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="company-section">
+        <section id="results" className="company-section">
           <div className="company-section-header">
             <span className="company-section-label">Client Results</span>
             <h2>Operational impact, not AI theater.</h2>
@@ -314,13 +437,22 @@ export default function LandingPage() {
           </p>
 
           <div className="company-final-actions">
-            <Link to="/intake" className="company-cta-light">
-              Book a strategy call
-              <ArrowRight size={16} />
-            </Link>
+            <MagneticFlightLink to="/intake" label="Book a strategy call" variant="light" />
           </div>
         </section>
       </main>
+
+      <footer className="company-footer">
+        <div className="company-footer-copy">
+          <span className="company-footer-label">Compliance Layer</span>
+          <p>
+            The intake is built to get serious operators onto a strategy call cleanly, with clear
+            consent, operational-only follow-up, and accessible legal terms throughout the funnel.
+          </p>
+        </div>
+
+        <LegalLinks tone="light" align="right" condensed />
+      </footer>
     </div>
   );
 }

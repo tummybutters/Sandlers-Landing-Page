@@ -35,6 +35,7 @@ export default async function handler(req, res) {
     const result = await processIntakeSubmission(body, {
       ...process.env,
       REQUEST_ORIGIN: getRequestOrigin(req),
+      REQUEST_USER_AGENT: req.headers['user-agent'] || '',
     });
     return res.status(result.status).json(result.payload);
   } catch (error) {

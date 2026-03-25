@@ -1,3 +1,10 @@
+import {
+  LEGAL_CONSENT_LABEL_TEXT,
+  LEGAL_CONSENT_PARTS,
+  SMS_CONSENT_HELP_PARTS,
+  SMS_CONSENT_LABEL_TEXT,
+} from '../legal/legalConfig';
+
 export const QUESTION_STEPS = [
   {
     id: 'q01_company_model',
@@ -264,7 +271,8 @@ export const CONTACT_STEP = {
   id: 'contact_info',
   kicker: 'Contact Info',
   title: 'Where should we send next steps?',
-  description: 'We use this to review your intake and prepare the strategy call properly.',
+  description:
+    'We use this to review your intake, carry your details into the booking flow, and prepare the strategy call properly.',
   fields: [
     {
       name: 'fullName',
@@ -300,6 +308,23 @@ export const CONTACT_STEP = {
       placeholder: '+1 (555) 000-0000',
       type: 'tel',
       required: true,
+      helperText:
+        'We carry this into the booking flow for the call handoff. Text reminders are sent only if you opt in below.',
+    },
+    {
+      name: 'legalAccepted',
+      label: LEGAL_CONSENT_LABEL_TEXT,
+      labelParts: LEGAL_CONSENT_PARTS,
+      type: 'consent',
+      required: true,
+      errorMessage: 'You must accept the Privacy Policy and Terms of Service to continue.',
+    },
+    {
+      name: 'smsOptIn',
+      label: SMS_CONSENT_LABEL_TEXT,
+      helperParts: SMS_CONSENT_HELP_PARTS,
+      type: 'consent',
+      required: false,
     },
   ],
 };

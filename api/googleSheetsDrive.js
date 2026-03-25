@@ -21,6 +21,15 @@ export const SHEET_HEADERS = [
   'template_name',
   'template_description',
   'preferred_contact',
+  'legal_accepted',
+  'legal_accepted_at',
+  'legal_version',
+  'sms_opt_in',
+  'sms_opt_in_at',
+  'sms_opt_out_at',
+  'sms_help_requested_at',
+  'sms_consent_scope',
+  'consent_audit_json',
   'logo_file_name',
   'logo_mime_type',
   'logo_blob_pathname',
@@ -105,6 +114,7 @@ function getRowRange(sheetName, rowNumber) {
 }
 
 function buildRowValues(submission) {
+  const consent = submission.consent || {};
   const messaging = submission.messaging || {};
 
   return [
@@ -128,6 +138,15 @@ function buildRowValues(submission) {
     submission.website.template?.name || '',
     submission.website.template?.description || '',
     submission.preferredContact,
+    consent.legalAccepted ? 'true' : 'false',
+    consent.legalAcceptedAt || '',
+    consent.legalVersion || '',
+    consent.smsOptIn ? 'true' : 'false',
+    consent.smsOptInAt || '',
+    consent.smsOptOutAt || '',
+    consent.smsHelpRequestedAt || '',
+    consent.smsConsentScope || '',
+    JSON.stringify(consent),
     submission.assets.logo.fileName || '',
     submission.assets.logo.mimeType || '',
     submission.assets.logo.storage.pathname || '',
@@ -239,6 +258,23 @@ function parseSmsThread(rowRecord) {
   } catch {
     return [];
   }
+}
+
+function parseConsentAudit(rowRecord) {
+  if (!rowRecord.consent_audit_json) {
+    return {};
+  }
+
+  try {
+    const parsed = JSON.parse(rowRecord.consent_audit_json);
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function isTruthyValue(value) {
+  return ['true', '1', 'yes', 'on'].includes(String(value || '').trim().toLowerCase());
 }
 
 async function updateRowRecord(env, matchRowIndex, mutateRecord) {
@@ -377,6 +413,8 @@ export async function appendInboundSmsToSubmission(fromPhoneNumber, message, env
 
   const updated = await updateRowRecord(env, matchedRowIndex, (rowRecord) => {
     const thread = parseSmsThread(rowRecord);
+    const consentAudit = parseConsentAudit(rowRecord);
+    const normalizedBody = String(message.body || '').trim().toUpperCase();
     thread.push({
       sid: message.sid,
       direction: 'inbound',
@@ -387,13 +425,35 @@ export async function appendInboundSmsToSubmission(fromPhoneNumber, message, env
       status: 'received',
     });
 
-    rowRecord.notification_status = 'replied';
-    rowRecord.sms_status = 'replied';
+    if (['STOP', 'STOPALL', 'UNSUBSCRIBE', 'CANCEL', 'END', 'QUIT'].includes(normalizedBody)) {
+      rowRecord.notification_status = 'sms_opted_out';
+      rowRecord.sms_status = 'revoked';
+      rowRecord.sms_opt_in = 'false';
+      rowRecord.sms_opt_out_at = message.receivedAt;
+      consentAudit.smsOptIn = false;
+      consentAudit.smsOptOutAt = message.receivedAt;
+    } else if (['HELP', 'INFO', 'SUPPORT'].includes(normalizedBody)) {
+      rowRecord.notification_status = 'sms_help_requested';
+      rowRecord.sms_status = 'help_requested';
+      rowRecord.sms_help_requested_at = message.receivedAt;
+      consentAudit.smsHelpRequestedAt = message.receivedAt;
+    } else {
+      rowRecord.notification_status = 'replied';
+      rowRecord.sms_status = isTruthyValue(rowRecord.sms_opt_in) ? 'replied' : rowRecord.sms_status || 'received';
+    }
+
     rowRecord.twilio_from_number = rowRecord.twilio_from_number || message.to || '';
     rowRecord.twilio_to_number = message.from || rowRecord.twilio_to_number;
     rowRecord.twilio_last_inbound_body = message.body;
     rowRecord.twilio_last_inbound_at = message.receivedAt;
     rowRecord.sms_thread_json = JSON.stringify(thread);
+    rowRecord.consent_audit_json = JSON.stringify({
+      ...consentAudit,
+      capture:
+        consentAudit.capture && typeof consentAudit.capture === 'object'
+          ? consentAudit.capture
+          : {},
+    });
   });
 
   return { submissionId: updated.submission_id };

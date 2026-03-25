@@ -1,6 +1,9 @@
 const DEFAULT_PAYMENT_CONFIRMED_SMS =
   "Hey! This is Summer from Qortana Websites. We work directly with Malohn Capital and just received your payment. We’ll begin building your website now, and you can expect the next update from this number within 24 hours. If you have any questions in the meantime, please reach out to your Malohn Capital rep.";
 
+const STOP_KEYWORDS = new Set(['STOP', 'STOPALL', 'UNSUBSCRIBE', 'CANCEL', 'END', 'QUIT']);
+const HELP_KEYWORDS = new Set(['HELP', 'INFO', 'SUPPORT']);
+
 export function normalizePhoneNumber(rawPhoneNumber) {
   const input = `${rawPhoneNumber || ''}`.trim();
   if (!input) {
@@ -22,6 +25,36 @@ export function normalizePhoneNumber(rawPhoneNumber) {
   }
 
   throw new Error('Phone number must be a valid US number with 10 digits or include a country code');
+}
+
+export function getInboundSmsIntent(body) {
+  const normalized = String(body || '').trim().toUpperCase();
+
+  if (STOP_KEYWORDS.has(normalized)) {
+    return 'stop';
+  }
+
+  if (HELP_KEYWORDS.has(normalized)) {
+    return 'help';
+  }
+
+  return 'message';
+}
+
+export function canSendOperationalSms(submission) {
+  return Boolean(
+    submission?.consent?.smsOptIn &&
+      !submission?.consent?.smsOptOutAt &&
+      submission?.customer?.phoneNumber,
+  );
+}
+
+export async function sendOperationalSms(submission, body, env) {
+  if (!canSendOperationalSms(submission)) {
+    throw new Error('SMS consent is not active for this submission');
+  }
+
+  return sendTwilioSms(submission.customer.phoneNumber, body, env);
 }
 
 function getTwilioAuth(env) {

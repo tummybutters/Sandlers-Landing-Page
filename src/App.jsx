@@ -5,6 +5,7 @@ import { templateRegistry } from './templateStudio/templateRegistry';
 
 const IntakeApp = lazy(() => import('./components/IntakeApp'));
 const LandingPage = lazy(() => import('./components/LandingPage'));
+const LegalPage = lazy(() => import('./components/LegalPage'));
 
 function getTemplatePreviewData(templateId) {
   return sampleSites.find((entry) => entry.data.templateId === templateId)?.data || { templateId };
@@ -34,6 +35,9 @@ export default function App() {
             />
           ))}
           <Route path="/intake" element={<IntakeApp />} />
+          <Route path="/privacy" element={<LegalPage pageKey="privacy" />} />
+          <Route path="/terms" element={<LegalPage pageKey="terms" />} />
+          <Route path="/messaging-terms" element={<LegalPage pageKey="messagingTerms" />} />
           <Route path="/" element={<LandingPage />} />
           <Route path="*" element={<LandingPage />} />
         </Routes>

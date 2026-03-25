@@ -7,9 +7,9 @@
   "display": "standalone",
   "icons": [
     {
-      "src": "/favicon.svg",
-      "sizes": "128x128",
-      "type": "image/svg+xml",
+      "src": "/qortana-logo.png",
+      "sizes": "256x256",
+      "type": "image/png",
       "purpose": "any"
     }
   ]
