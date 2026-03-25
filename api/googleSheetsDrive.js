@@ -1,55 +1,107 @@
 import { google } from 'googleapis';
 
+export const SHEET_COLUMNS = {
+  submissionId: 'record_submission_id',
+  createdAt: 'record_created_at_utc',
+  updatedAt: 'record_updated_at_utc',
+  submissionStatus: 'pipeline_submission_status',
+  paymentStatus: 'billing_payment_status',
+  buildStatus: 'delivery_build_status',
+  domainStatus: 'delivery_domain_status',
+  notificationStatus: 'outreach_notification_status',
+  businessName: 'client_business_name',
+  contactEmail: 'client_contact_email',
+  phoneNumber: 'client_phone_e164',
+  businessAddress: 'client_business_address',
+  serviceArea: 'client_service_area',
+  domainPrimary: 'website_domain_primary',
+  domainSecondary: 'website_domain_secondary',
+  domainTertiary: 'website_domain_tertiary',
+  templateId: 'website_template_id',
+  templateName: 'website_template_name',
+  templateDescription: 'website_template_description',
+  preferredContact: 'contact_preference',
+  legalAccepted: 'consent_legal_accepted',
+  legalAcceptedAt: 'consent_legal_accepted_at_utc',
+  legalVersion: 'consent_legal_version',
+  smsOptIn: 'consent_sms_opt_in',
+  smsOptInAt: 'consent_sms_opt_in_at_utc',
+  smsOptOutAt: 'consent_sms_opt_out_at_utc',
+  smsHelpRequestedAt: 'consent_sms_help_requested_at_utc',
+  smsConsentScope: 'consent_sms_scope',
+  consentAuditJson: 'consent_audit_json',
+  logoFileName: 'asset_logo_file_name',
+  logoMimeType: 'asset_logo_mime_type',
+  logoBlobPathname: 'asset_logo_storage_pathname',
+  logoBlobUrl: 'asset_logo_storage_url',
+  smsStatus: 'messaging_sms_status',
+  twilioFromNumber: 'messaging_twilio_from_number',
+  twilioToNumber: 'messaging_twilio_to_number',
+  twilioLastOutboundSid: 'messaging_last_outbound_sid',
+  twilioLastOutboundBody: 'messaging_last_outbound_body',
+  twilioLastOutboundAt: 'messaging_last_outbound_at_utc',
+  twilioLastInboundBody: 'messaging_last_inbound_body',
+  twilioLastInboundAt: 'messaging_last_inbound_at_utc',
+  smsThreadJson: 'messaging_thread_json',
+  stripeCheckoutSessionId: 'billing_stripe_checkout_session_id',
+  stripeCustomerId: 'billing_stripe_customer_id',
+  stripeSubscriptionId: 'billing_stripe_subscription_id',
+  stripePaymentIntentId: 'billing_stripe_payment_intent_id',
+  paidAt: 'billing_paid_at_utc',
+  rawIntakeJson: 'intake_raw_json',
+  websiteJson: 'website_context_json',
+};
+
 export const SHEET_HEADERS = [
-  'submission_id',
-  'created_at',
-  'updated_at',
-  'status',
-  'payment_status',
-  'build_status',
-  'domain_status',
-  'notification_status',
-  'business_name',
-  'contact_email',
-  'phone_number',
-  'business_address',
-  'service_area',
-  'domain_1',
-  'domain_2',
-  'domain_3',
-  'template_id',
-  'template_name',
-  'template_description',
-  'preferred_contact',
-  'legal_accepted',
-  'legal_accepted_at',
-  'legal_version',
-  'sms_opt_in',
-  'sms_opt_in_at',
-  'sms_opt_out_at',
-  'sms_help_requested_at',
-  'sms_consent_scope',
-  'consent_audit_json',
-  'logo_file_name',
-  'logo_mime_type',
-  'logo_blob_pathname',
-  'logo_blob_url',
-  'sms_status',
-  'twilio_from_number',
-  'twilio_to_number',
-  'twilio_last_outbound_sid',
-  'twilio_last_outbound_body',
-  'twilio_last_outbound_at',
-  'twilio_last_inbound_body',
-  'twilio_last_inbound_at',
-  'sms_thread_json',
-  'stripe_checkout_session_id',
-  'stripe_customer_id',
-  'stripe_subscription_id',
-  'stripe_payment_intent_id',
-  'paid_at',
-  'raw_intake_json',
-  'website_json',
+  SHEET_COLUMNS.submissionId,
+  SHEET_COLUMNS.createdAt,
+  SHEET_COLUMNS.updatedAt,
+  SHEET_COLUMNS.submissionStatus,
+  SHEET_COLUMNS.paymentStatus,
+  SHEET_COLUMNS.buildStatus,
+  SHEET_COLUMNS.domainStatus,
+  SHEET_COLUMNS.notificationStatus,
+  SHEET_COLUMNS.businessName,
+  SHEET_COLUMNS.contactEmail,
+  SHEET_COLUMNS.phoneNumber,
+  SHEET_COLUMNS.businessAddress,
+  SHEET_COLUMNS.serviceArea,
+  SHEET_COLUMNS.domainPrimary,
+  SHEET_COLUMNS.domainSecondary,
+  SHEET_COLUMNS.domainTertiary,
+  SHEET_COLUMNS.templateId,
+  SHEET_COLUMNS.templateName,
+  SHEET_COLUMNS.templateDescription,
+  SHEET_COLUMNS.preferredContact,
+  SHEET_COLUMNS.legalAccepted,
+  SHEET_COLUMNS.legalAcceptedAt,
+  SHEET_COLUMNS.legalVersion,
+  SHEET_COLUMNS.smsOptIn,
+  SHEET_COLUMNS.smsOptInAt,
+  SHEET_COLUMNS.smsOptOutAt,
+  SHEET_COLUMNS.smsHelpRequestedAt,
+  SHEET_COLUMNS.smsConsentScope,
+  SHEET_COLUMNS.consentAuditJson,
+  SHEET_COLUMNS.logoFileName,
+  SHEET_COLUMNS.logoMimeType,
+  SHEET_COLUMNS.logoBlobPathname,
+  SHEET_COLUMNS.logoBlobUrl,
+  SHEET_COLUMNS.smsStatus,
+  SHEET_COLUMNS.twilioFromNumber,
+  SHEET_COLUMNS.twilioToNumber,
+  SHEET_COLUMNS.twilioLastOutboundSid,
+  SHEET_COLUMNS.twilioLastOutboundBody,
+  SHEET_COLUMNS.twilioLastOutboundAt,
+  SHEET_COLUMNS.twilioLastInboundBody,
+  SHEET_COLUMNS.twilioLastInboundAt,
+  SHEET_COLUMNS.smsThreadJson,
+  SHEET_COLUMNS.stripeCheckoutSessionId,
+  SHEET_COLUMNS.stripeCustomerId,
+  SHEET_COLUMNS.stripeSubscriptionId,
+  SHEET_COLUMNS.stripePaymentIntentId,
+  SHEET_COLUMNS.paidAt,
+  SHEET_COLUMNS.rawIntakeJson,
+  SHEET_COLUMNS.websiteJson,
 ];
 
 function columnNumberToLetter(columnNumber) {
@@ -248,12 +300,12 @@ async function getSheetRecords(env) {
 }
 
 function parseSmsThread(rowRecord) {
-  if (!rowRecord.sms_thread_json) {
+  if (!rowRecord[SHEET_COLUMNS.smsThreadJson]) {
     return [];
   }
 
   try {
-    const parsed = JSON.parse(rowRecord.sms_thread_json);
+    const parsed = JSON.parse(rowRecord[SHEET_COLUMNS.smsThreadJson]);
     return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
@@ -261,12 +313,12 @@ function parseSmsThread(rowRecord) {
 }
 
 function parseConsentAudit(rowRecord) {
-  if (!rowRecord.consent_audit_json) {
+  if (!rowRecord[SHEET_COLUMNS.consentAuditJson]) {
     return {};
   }
 
   try {
-    const parsed = JSON.parse(rowRecord.consent_audit_json);
+    const parsed = JSON.parse(rowRecord[SHEET_COLUMNS.consentAuditJson]);
     return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
   } catch {
     return {};
@@ -338,7 +390,7 @@ export async function updateSubmissionFromStripe(checkoutSession, env) {
   }
 
   const { rows, headerRow } = await getSheetRecords(env);
-  const submissionIndex = headerRow.indexOf('submission_id');
+  const submissionIndex = headerRow.indexOf(SHEET_COLUMNS.submissionId);
   const matchedRowIndex = rows.findIndex((row, index) => index > 0 && row[submissionIndex] === submissionId);
 
   if (matchedRowIndex === -1) {
@@ -346,13 +398,13 @@ export async function updateSubmissionFromStripe(checkoutSession, env) {
   }
 
   await updateRowRecord(env, matchedRowIndex, (rowRecord) => {
-    rowRecord.status = 'paid';
-    rowRecord.payment_status = 'paid';
-    rowRecord.stripe_checkout_session_id = checkoutSession.id || '';
-    rowRecord.stripe_customer_id = checkoutSession.customer || '';
-    rowRecord.stripe_subscription_id = checkoutSession.subscription || '';
-    rowRecord.stripe_payment_intent_id = checkoutSession.payment_intent || '';
-    rowRecord.paid_at = new Date().toISOString();
+    rowRecord[SHEET_COLUMNS.submissionStatus] = 'paid';
+    rowRecord[SHEET_COLUMNS.paymentStatus] = 'paid';
+    rowRecord[SHEET_COLUMNS.stripeCheckoutSessionId] = checkoutSession.id || '';
+    rowRecord[SHEET_COLUMNS.stripeCustomerId] = checkoutSession.customer || '';
+    rowRecord[SHEET_COLUMNS.stripeSubscriptionId] = checkoutSession.subscription || '';
+    rowRecord[SHEET_COLUMNS.stripePaymentIntentId] = checkoutSession.payment_intent || '';
+    rowRecord[SHEET_COLUMNS.paidAt] = new Date().toISOString();
   });
 
   return { submissionId };
@@ -367,7 +419,7 @@ export async function recordPaymentConfirmationSms(checkoutSession, smsResult, e
   }
 
   const { rows, headerRow } = await getSheetRecords(env);
-  const submissionIndex = headerRow.indexOf('submission_id');
+  const submissionIndex = headerRow.indexOf(SHEET_COLUMNS.submissionId);
   const matchedRowIndex = rows.findIndex((row, index) => index > 0 && row[submissionIndex] === submissionId);
 
   if (matchedRowIndex === -1) {
@@ -386,14 +438,14 @@ export async function recordPaymentConfirmationSms(checkoutSession, smsResult, e
       status: smsResult.status,
     });
 
-    rowRecord.notification_status = 'sent';
-    rowRecord.sms_status = smsResult.status || 'sent';
-    rowRecord.twilio_from_number = smsResult.from || rowRecord.twilio_from_number;
-    rowRecord.twilio_to_number = smsResult.to || rowRecord.twilio_to_number;
-    rowRecord.twilio_last_outbound_sid = smsResult.sid || '';
-    rowRecord.twilio_last_outbound_body = smsResult.body || '';
-    rowRecord.twilio_last_outbound_at = smsResult.sentAt || '';
-    rowRecord.sms_thread_json = JSON.stringify(thread);
+    rowRecord[SHEET_COLUMNS.notificationStatus] = 'sent';
+    rowRecord[SHEET_COLUMNS.smsStatus] = smsResult.status || 'sent';
+    rowRecord[SHEET_COLUMNS.twilioFromNumber] = smsResult.from || rowRecord[SHEET_COLUMNS.twilioFromNumber];
+    rowRecord[SHEET_COLUMNS.twilioToNumber] = smsResult.to || rowRecord[SHEET_COLUMNS.twilioToNumber];
+    rowRecord[SHEET_COLUMNS.twilioLastOutboundSid] = smsResult.sid || '';
+    rowRecord[SHEET_COLUMNS.twilioLastOutboundBody] = smsResult.body || '';
+    rowRecord[SHEET_COLUMNS.twilioLastOutboundAt] = smsResult.sentAt || '';
+    rowRecord[SHEET_COLUMNS.smsThreadJson] = JSON.stringify(thread);
   });
 
   return { submissionId };
@@ -401,7 +453,7 @@ export async function recordPaymentConfirmationSms(checkoutSession, smsResult, e
 
 export async function appendInboundSmsToSubmission(fromPhoneNumber, message, env) {
   const { rows, headerRow } = await getSheetRecords(env);
-  const phoneIndex = headerRow.indexOf('phone_number');
+  const phoneIndex = headerRow.indexOf(SHEET_COLUMNS.phoneNumber);
 
   const matchedRowIndex = [...rows.keys()]
     .reverse()
@@ -426,28 +478,30 @@ export async function appendInboundSmsToSubmission(fromPhoneNumber, message, env
     });
 
     if (['STOP', 'STOPALL', 'UNSUBSCRIBE', 'CANCEL', 'END', 'QUIT'].includes(normalizedBody)) {
-      rowRecord.notification_status = 'sms_opted_out';
-      rowRecord.sms_status = 'revoked';
-      rowRecord.sms_opt_in = 'false';
-      rowRecord.sms_opt_out_at = message.receivedAt;
+      rowRecord[SHEET_COLUMNS.notificationStatus] = 'sms_opted_out';
+      rowRecord[SHEET_COLUMNS.smsStatus] = 'revoked';
+      rowRecord[SHEET_COLUMNS.smsOptIn] = 'false';
+      rowRecord[SHEET_COLUMNS.smsOptOutAt] = message.receivedAt;
       consentAudit.smsOptIn = false;
       consentAudit.smsOptOutAt = message.receivedAt;
     } else if (['HELP', 'INFO', 'SUPPORT'].includes(normalizedBody)) {
-      rowRecord.notification_status = 'sms_help_requested';
-      rowRecord.sms_status = 'help_requested';
-      rowRecord.sms_help_requested_at = message.receivedAt;
+      rowRecord[SHEET_COLUMNS.notificationStatus] = 'sms_help_requested';
+      rowRecord[SHEET_COLUMNS.smsStatus] = 'help_requested';
+      rowRecord[SHEET_COLUMNS.smsHelpRequestedAt] = message.receivedAt;
       consentAudit.smsHelpRequestedAt = message.receivedAt;
     } else {
-      rowRecord.notification_status = 'replied';
-      rowRecord.sms_status = isTruthyValue(rowRecord.sms_opt_in) ? 'replied' : rowRecord.sms_status || 'received';
+      rowRecord[SHEET_COLUMNS.notificationStatus] = 'replied';
+      rowRecord[SHEET_COLUMNS.smsStatus] = isTruthyValue(rowRecord[SHEET_COLUMNS.smsOptIn])
+        ? 'replied'
+        : rowRecord[SHEET_COLUMNS.smsStatus] || 'received';
     }
 
-    rowRecord.twilio_from_number = rowRecord.twilio_from_number || message.to || '';
-    rowRecord.twilio_to_number = message.from || rowRecord.twilio_to_number;
-    rowRecord.twilio_last_inbound_body = message.body;
-    rowRecord.twilio_last_inbound_at = message.receivedAt;
-    rowRecord.sms_thread_json = JSON.stringify(thread);
-    rowRecord.consent_audit_json = JSON.stringify({
+    rowRecord[SHEET_COLUMNS.twilioFromNumber] = rowRecord[SHEET_COLUMNS.twilioFromNumber] || message.to || '';
+    rowRecord[SHEET_COLUMNS.twilioToNumber] = message.from || rowRecord[SHEET_COLUMNS.twilioToNumber];
+    rowRecord[SHEET_COLUMNS.twilioLastInboundBody] = message.body;
+    rowRecord[SHEET_COLUMNS.twilioLastInboundAt] = message.receivedAt;
+    rowRecord[SHEET_COLUMNS.smsThreadJson] = JSON.stringify(thread);
+    rowRecord[SHEET_COLUMNS.consentAuditJson] = JSON.stringify({
       ...consentAudit,
       capture:
         consentAudit.capture && typeof consentAudit.capture === 'object'
@@ -456,5 +510,5 @@ export async function appendInboundSmsToSubmission(fromPhoneNumber, message, env
     });
   });
 
-  return { submissionId: updated.submission_id };
+  return { submissionId: updated[SHEET_COLUMNS.submissionId] };
 }
