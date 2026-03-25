@@ -1,5 +1,6 @@
 {
-  "name": "malohn-capital-intake",
+  "name": "qortana-sandler-landing-page",
+  "description": "Landing page and intake flow for the Qortana managed sales-ops assistant.",
   "private": true,
   "version": "1.0.0",
   "type": "module",

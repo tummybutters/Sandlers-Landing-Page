@@ -1,13 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Check } from 'lucide-react';
-import { QUESTION_STEPS, SANDLER_INTAKE_STEPS } from '../intake/sandlerIntakeConfig';
+import { ArrowUpRight, Check } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { QORTANA_INTAKE_STEPS, QUESTION_STEPS } from '../intake/sandlerIntakeConfig';
 
 const INTAKE_API_URL = '/api/intake';
 const INTAKE_TIMEOUT_MS = 5000;
 const INTAKE_RETRY_DELAY_MS = 400;
 const INTAKE_MAX_ATTEMPTS = 2;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const QORTANA_BOOKING_URL = String(import.meta.env.VITE_QORTANA_BOOKING_URL || '').trim();
 
 function SuccessPage() {
   return (
@@ -28,18 +30,44 @@ function SuccessPage() {
           <Check size={22} strokeWidth={2.5} />
         </div>
 
-        <p className="success-eyebrow">Intake Submitted</p>
-        <h1 className="success-title">You&apos;re in.</h1>
+        <p className="success-eyebrow">Strategy Intake Submitted</p>
+        <h1 className="success-title">You&apos;re in the queue.</h1>
         <p className="success-body">
-          Your Sandler Agent Intake is in the queue. We&apos;ll use it to understand your workflow,
-          systems, and friction points before we follow up.
+          Your Qortana infrastructure strategy intake is in. We&apos;ll use it to map the
+          workflows, systems, and approval boundaries worth discussing first.
         </p>
         <p className="success-contact">
-          If anything is missing, we&apos;ll reach out using the contact details you just sent.
+          The next step is locking in the call so we can walk through what should be automated,
+          what should stay behind review, and what production deployment would actually require.
         </p>
 
+        <div className="success-actions">
+          {QORTANA_BOOKING_URL ? (
+            <a
+              href={QORTANA_BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="success-primary-action"
+            >
+              Book your strategy call
+              <ArrowUpRight size={16} />
+            </a>
+          ) : (
+            <div className="success-pending-action">
+              Booking link not configured yet. We&apos;ll follow up directly using the contact
+              details you sent.
+            </div>
+          )}
+
+          <Link to="/" className="success-secondary-action">
+            Back to homepage
+          </Link>
+        </div>
+
         <div className="success-divider" />
-        <p className="success-fine">Sandler Agent Intake • Workflow, systems, and trust-boundary review</p>
+        <p className="success-fine">
+          Qortana Strategy Intake • Workflow, systems, governance, and infrastructure review
+        </p>
       </motion.div>
     </div>
   );
@@ -139,7 +167,7 @@ function buildSubmissionPayload(submissionId, formData) {
     submissionId,
     createdAt: submittedAt,
     updatedAt: submittedAt,
-    source: 'sandler_agent_intake',
+    source: 'qortana_company_intake',
     preferredContact: 'Email',
     customer: {
       fullName: formData.fullName || '',
@@ -147,19 +175,23 @@ function buildSubmissionPayload(submissionId, formData) {
       contactEmail: formData.contactEmail || '',
       phoneNumber: formData.phoneNumber || '',
       businessAddress: '',
-      serviceArea: formData.mainTerritory || '',
+      serviceArea: formData.operatingRegion || '',
     },
     rawIntake: {
-      intakeType: 'sandler_agent_intake',
-      intakeLabel: 'Sandler Agent Intake',
+      intakeType: 'qortana_company_intake',
+      intakeLabel: 'Qortana Strategy Intake',
       questionCount: QUESTION_STEPS.length,
       submittedAt,
       fullName: formData.fullName || '',
+      roleTitle: formData.roleTitle || '',
       businessName: formData.businessName || '',
       contactEmail: formData.contactEmail || '',
       phoneNumber: formData.phoneNumber || '',
-      territory: formData.mainTerritory || '',
-      roleType: formData.roleType || '',
+      operatingRegion: formData.operatingRegion || '',
+      companyModel: formData.companyModel || '',
+      revenueBand: formData.revenueBand || '',
+      aiMaturity: formData.aiMaturity || '',
+      deploymentTimeline: formData.deploymentTimeline || '',
       answers,
       answersOrdered,
     },
@@ -199,9 +231,9 @@ export default function IntakeApp() {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
-  const currentStep = SANDLER_INTAKE_STEPS[currentStepIdx];
-  const progress = ((currentStepIdx + 1) / SANDLER_INTAKE_STEPS.length) * 100;
-  const isLastStep = currentStepIdx === SANDLER_INTAKE_STEPS.length - 1;
+  const currentStep = QORTANA_INTAKE_STEPS[currentStepIdx];
+  const progress = ((currentStepIdx + 1) / QORTANA_INTAKE_STEPS.length) * 100;
+  const isLastStep = currentStepIdx === QORTANA_INTAKE_STEPS.length - 1;
 
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -326,11 +358,11 @@ export default function IntakeApp() {
         <span className="corner corner-br" />
 
         <div className="card-header">
-          <span className="brand-label">Sandler Agent Intake</span>
+          <span className="brand-label">Qortana Strategy Intake</span>
           <span className="step-counter">
             <span className="step-current">{String(currentStepIdx + 1).padStart(2, '0')}</span>
             <span className="step-sep"> / </span>
-            <span className="step-total">{String(SANDLER_INTAKE_STEPS.length).padStart(2, '0')}</span>
+            <span className="step-total">{String(QORTANA_INTAKE_STEPS.length).padStart(2, '0')}</span>
           </span>
         </div>
 
@@ -422,7 +454,7 @@ export default function IntakeApp() {
                 disabled={loading}
                 className={`nav-next${loading ? ' nav-loading' : ''}`}
               >
-                {loading ? 'Submitting...' : isLastStep ? 'Submit Intake →' : 'Continue →'}
+                {loading ? 'Submitting...' : isLastStep ? 'Send Strategy Intake →' : 'Continue →'}
               </button>
             </div>
             {stepError && <div className="checkout-error">{stepError}</div>}

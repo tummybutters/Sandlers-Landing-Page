@@ -1,0 +1,57 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#F8F3EB"/>
+  <rect width="1200" height="630" fill="url(#grid)" opacity="0.42"/>
+  <circle cx="154" cy="118" r="130" fill="#E7D7BA" opacity="0.55"/>
+  <circle cx="1018" cy="120" r="160" fill="#E0CCAA" opacity="0.4"/>
+  <circle cx="920" cy="520" r="190" fill="#E8D9BE" opacity="0.3"/>
+
+  <rect x="70" y="68" width="186" height="44" rx="22" fill="#FFFDF8" stroke="#D8C5A1"/>
+  <text x="163" y="96" text-anchor="middle" fill="#A67A22" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" letter-spacing="4">QORTANA</text>
+
+  <text x="72" y="198" fill="#18120D" font-family="Arial, Helvetica, sans-serif" font-size="66" font-weight="700">
+    <tspan x="72" dy="0">The infrastructure partner</tspan>
+    <tspan x="72" dy="82" fill="#9E7225" font-family="Georgia, Times New Roman, serif" font-style="italic" font-weight="500">for companies ready to run</tspan>
+    <tspan x="72" dy="78" fill="#9E7225" font-family="Georgia, Times New Roman, serif" font-style="italic" font-weight="500">AI agents in production.</tspan>
+  </text>
+
+  <text x="72" y="438" fill="#4E4031" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="500">
+    <tspan x="72" dy="0">Enterprise-grade autonomous AI systems for fast-moving B2B teams.</tspan>
+    <tspan x="72" dy="40">Architecture, deployment, security hardening, and ongoing management.</tspan>
+  </text>
+
+  <rect x="72" y="500" width="650" height="72" rx="36" fill="#FFFDF8" stroke="#E1D1AE"/>
+  <text x="110" y="543" fill="#4E4031" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="600">Dedicated infrastructure per client. No shared runtimes.</text>
+
+  <g filter="url(#shadow)">
+    <rect x="804" y="128" width="310" height="386" rx="40" fill="#FFFDF8"/>
+    <rect x="822" y="148" width="274" height="348" rx="30" fill="#17110C"/>
+    <rect x="844" y="180" width="230" height="46" rx="23" fill="#2C2218"/>
+    <text x="865" y="209" fill="#F7ECDD" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="600">PRODUCTION AGENT RUNTIME</text>
+
+    <rect x="844" y="248" width="230" height="80" rx="24" fill="#F7F0E3"/>
+    <text x="865" y="277" fill="#8F6623" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700" letter-spacing="2">AUTONOMOUS COVERAGE</text>
+    <text x="865" y="306" fill="#2A2118" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="600">Slack, email, SMS, CRM</text>
+
+    <rect x="844" y="346" width="230" height="56" rx="18" fill="#241A11"/>
+    <text x="865" y="380" fill="#F6EAD7" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="600">Policy gates active</text>
+
+    <rect x="844" y="420" width="230" height="56" rx="18" fill="#F7F0E3"/>
+    <text x="865" y="454" fill="#2A2118" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="600">Audit trails + isolation</text>
+  </g>
+
+  <defs>
+    <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse">
+      <path d="M44 0H0V44" stroke="#D7C9B4" stroke-width="1"/>
+    </pattern>
+    <filter id="shadow" x="774" y="102" width="370" height="444" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="14"/>
+      <feGaussianBlur stdDeviation="15"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.27 0 0 0 0 0.19 0 0 0 0 0.09 0 0 0 0.18 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_2"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_2" result="shape"/>
+    </filter>
+  </defs>
+</svg>

@@ -1,0 +1,16 @@
+{
+  "name": "Qortana",
+  "short_name": "Qortana",
+  "description": "AI infrastructure consulting and autonomous agent deployment for fast-moving B2B companies.",
+  "theme_color": "#f3eadb",
+  "background_color": "#f8f3eb",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "128x128",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

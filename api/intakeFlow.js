@@ -29,7 +29,7 @@ function normalizeSubmission(body) {
     submissionId: incoming.submissionId || '',
     createdAt: incoming.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    source: incoming.source || 'sandler_agent_intake',
+    source: incoming.source || 'qortana_company_intake',
     status: 'submitted',
     paymentStatus: 'not_applicable',
     buildStatus: 'not_applicable',
@@ -42,7 +42,7 @@ function normalizeSubmission(body) {
       contactEmail: customer.contactEmail || rawIntake.contactEmail || '',
       phoneNumber: normalizedPhone,
       businessAddress: customer.businessAddress || '',
-      serviceArea: customer.serviceArea || rawIntake.territory || '',
+      serviceArea: customer.serviceArea || rawIntake.operatingRegion || rawIntake.territory || '',
     },
     website: {
       domains: [],
