@@ -2,7 +2,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Cable, Clock3, ServerCog, ShieldCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import LegalLinks from './LegalLinks';
 import { MagneticFlightLink, RollingNavLink } from './PremiumMotionLinks';
 
 const transition = { duration: 0.75, ease: [0.22, 1, 0.36, 1] };
@@ -441,18 +440,6 @@ export default function LandingPage() {
           </div>
         </section>
       </main>
-
-      <footer className="company-footer">
-        <div className="company-footer-copy">
-          <span className="company-footer-label">Compliance Layer</span>
-          <p>
-            The intake is built to get serious operators onto a strategy call cleanly, with clear
-            consent, operational-only follow-up, and accessible legal terms throughout the funnel.
-          </p>
-        </div>
-
-        <LegalLinks tone="light" align="right" condensed />
-      </footer>
     </div>
   );
 }

@@ -3,12 +3,12 @@ export const COMPANY_LEGAL_NAME = 'Qortana';
 export const LEGAL_VERSION = '2026-03-25';
 export const LEGAL_EFFECTIVE_DATE = 'March 25, 2026';
 export const LEGAL_LAST_UPDATED = 'March 25, 2026';
-export const SUPPORT_EMAIL = 'legal@yourdomain.com';
-export const SUPPORT_PHONE = '(000) 000-0000';
-export const POSTAL_ADDRESS_LINES = ['Your Company Mailing Address'];
+export const SUPPORT_EMAIL = 'thomasbutcher@qortana.com';
+export const SUPPORT_PHONE = '(949) 395-1074';
+export const POSTAL_ADDRESS_LINES = [];
 export const GOVERNING_LAW_STATE = 'California';
 export const GOVERNING_VENUE = 'Orange County, California';
-export const PRIVACY_RIGHTS_EMAIL = 'privacy@yourdomain.com';
+export const PRIVACY_RIGHTS_EMAIL = 'thomasbutcher@qortana.com';
 
 export const LEGAL_ROUTES = [
   { to: '/privacy', label: 'Privacy Policy' },

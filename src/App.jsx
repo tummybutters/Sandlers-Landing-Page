@@ -1,5 +1,6 @@
 import { Suspense, lazy } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import GlobalFooter from './components/GlobalFooter';
 import { sampleSites } from './templateStudio/sampleSites';
 import { templateRegistry } from './templateStudio/templateRegistry';
 
@@ -22,9 +23,9 @@ function TemplatePreview({ templateId }) {
   return <Preview data={getTemplatePreviewData(templateId)} />;
 }
 
-export default function App() {
+function AppRoutes() {
   return (
-    <BrowserRouter>
+    <>
       <Suspense fallback={<div className="app-loading-state" />}>
         <Routes>
           {templateRegistry.map((template) => (
@@ -42,6 +43,16 @@ export default function App() {
           <Route path="*" element={<LandingPage />} />
         </Routes>
       </Suspense>
+
+      <GlobalFooter />
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
     </BrowserRouter>
   );
 }

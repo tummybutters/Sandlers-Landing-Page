@@ -1706,13 +1706,25 @@ textarea {
   position: relative;
   min-height: 100svh;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
   background:
     radial-gradient(circle at top left, rgba(184, 148, 60, 0.12), transparent 24%),
     radial-gradient(circle at bottom right, rgba(132, 106, 68, 0.08), transparent 28%),
     var(--c-bg);
+}
+
+.root-wrapper-intake {
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: column;
+  gap: 18px;
+  overflow: visible;
+  padding: 36px 20px 72px;
+}
+
+.root-wrapper-success {
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
   padding: 20px;
 }
 
@@ -1743,15 +1755,15 @@ textarea {
   position: relative;
   z-index: 1;
   width: min(750px, calc(100vw - 40px));
-  height: min(585px, calc(100svh - 40px));
-  overflow: hidden;
+  height: auto;
+  overflow: visible;
   padding: 26px 30px 20px;
   background: var(--c-surface);
   border: 1px solid var(--c-border);
   box-shadow: 0 26px 90px rgba(58, 39, 17, 0.12);
   backdrop-filter: blur(18px);
   display: grid;
-  grid-template-rows: auto auto auto minmax(0, 1fr) auto auto;
+  grid-template-rows: auto auto minmax(0, 1fr);
 }
 
 .success-card {
@@ -1878,7 +1890,7 @@ textarea {
 
 .intake-step-content {
   min-height: 0;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   flex-direction: column;
 }
@@ -1886,7 +1898,7 @@ textarea {
 .step-body {
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
+  overflow: visible;
 }
 
 .fields-container {
@@ -2274,15 +2286,68 @@ textarea {
   margin-top: 18px;
 }
 
+.compliance-panel {
+  position: relative;
+  z-index: 1;
+  width: min(750px, calc(100vw - 40px));
+  padding: 24px 30px 26px;
+  border: 1px solid rgba(96, 75, 40, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0.3)),
+    rgba(255, 252, 247, 0.76);
+  box-shadow: 0 24px 70px rgba(58, 39, 17, 0.08);
+}
+
+.compliance-panel-copy h2 {
+  margin-top: 10px;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(2rem, 4vw, 2.7rem);
+  line-height: 1;
+}
+
+.compliance-panel-copy p {
+  margin-top: 12px;
+  color: var(--c-secondary);
+  line-height: 1.72;
+}
+
+.compliance-kicker {
+  display: inline-block;
+  color: var(--c-gold);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.compliance-options {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.compliance-option + .compliance-option {
+  margin-top: 2px;
+}
+
+.nav-row-standalone {
+  margin-top: 22px;
+}
+
 .enter-hint {
-  position: absolute;
-  right: 24px;
-  bottom: 20px;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--c-secondary);
+}
+
+.root-wrapper-intake .enter-hint {
+  position: static;
+  align-self: flex-end;
+  margin-right: 8px;
 }
 
 .enter-key {
@@ -2492,6 +2557,17 @@ textarea {
   .step-counter,
   .enter-hint {
     font-weight: 700;
+  }
+
+  .root-wrapper-intake {
+    padding: 18px 12px 40px;
+  }
+
+  .form-card,
+  .compliance-panel {
+    width: min(100vw - 24px, 100%);
+    padding-left: 18px;
+    padding-right: 18px;
   }
 }
 
@@ -3954,9 +4030,15 @@ textarea {
   }
 }
 
-.company-footer {
-  width: min(1400px, calc(100vw - 40px));
-  margin: 0 auto 28px;
+.global-footer {
+  position: relative;
+  z-index: 2;
+  padding: 0 20px 28px;
+}
+
+.global-footer-shell {
+  width: min(1400px, 100%);
+  margin: 0 auto;
   padding: 22px 24px;
   border: 1px solid rgba(120, 92, 54, 0.12);
   background:
@@ -3966,12 +4048,17 @@ textarea {
     0 22px 60px rgba(74, 47, 17, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.72);
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) auto;
+  grid-template-columns: minmax(0, 1.3fr) minmax(240px, 0.9fr) auto;
   gap: 24px;
   align-items: end;
 }
 
-.company-footer-label,
+.global-footer-column {
+  display: grid;
+  gap: 10px;
+}
+
+.global-footer-label,
 .legal-links-label {
   display: inline-block;
   margin-bottom: 8px;
@@ -3981,10 +4068,53 @@ textarea {
   text-transform: uppercase;
 }
 
-.company-footer-copy p {
+.global-footer-copy {
   max-width: 660px;
   color: #5b4737;
   line-height: 1.8;
+}
+
+.global-footer-contact-list,
+.global-footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.global-footer-contact-link,
+.global-footer-nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid rgba(120, 92, 54, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 252, 247, 0.72);
+  color: #4c392b;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition: transform 0.22s ease, border-color 0.22s ease, background 0.22s ease, color 0.22s ease;
+}
+
+.global-footer-contact-link:hover,
+.global-footer-contact-link:focus-visible,
+.global-footer-nav-link:hover,
+.global-footer-nav-link:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(177, 131, 47, 0.3);
+  background: rgba(255, 248, 237, 0.92);
+}
+
+.global-footer-nav-link-active {
+  border-color: rgba(167, 122, 34, 0.32);
+  background: rgba(184, 148, 60, 0.12);
+  color: #2d2013;
+}
+
+.global-footer-legal {
+  justify-self: end;
 }
 
 .legal-links {
@@ -4249,9 +4379,13 @@ textarea {
 }
 
 @media (max-width: 920px) {
-  .company-footer,
+  .global-footer-shell,
   .legal-hero {
     grid-template-columns: 1fr;
+  }
+
+  .global-footer-legal {
+    justify-self: start;
   }
 
   .legal-links-align-right {
@@ -4260,13 +4394,16 @@ textarea {
 }
 
 @media (max-width: 720px) {
-  .company-footer,
+  .global-footer,
   .legal-page {
     width: min(calc(100vw - 24px), 100%);
   }
 
-  .company-footer {
-    margin-bottom: 18px;
+  .global-footer {
+    padding: 0 12px 18px;
+  }
+
+  .global-footer-shell {
     padding: 18px;
   }
 
@@ -4285,6 +4422,12 @@ textarea {
   }
 
   .legal-links-item {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .global-footer-contact-link,
+  .global-footer-nav-link {
     width: 100%;
     justify-content: center;
   }

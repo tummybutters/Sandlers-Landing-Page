@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowUpRight, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import LegalLinks from './LegalLinks';
 import { QORTANA_INTAKE_STEPS, QUESTION_STEPS } from '../intake/sandlerIntakeConfig';
 import {
   BRAND_NAME,
@@ -146,6 +145,40 @@ function renderRichParts(parts) {
   });
 }
 
+function renderConsentField(field, formData, updateFormData) {
+  const fieldId = `field-${field.name}`;
+
+  return (
+    <div key={field.name} className="compliance-option">
+      <div className="consent-field">
+        <input
+          id={fieldId}
+          type="checkbox"
+          className="consent-input"
+          checked={Boolean(formData[field.name])}
+          onChange={(event) => updateFormData(field.name, event.target.checked)}
+        />
+
+        <label htmlFor={fieldId} className="consent-box" aria-hidden="true">
+          {formData[field.name] ? <Check size={14} strokeWidth={3} /> : null}
+        </label>
+
+        <div className="consent-copy">
+          <label htmlFor={fieldId} className="consent-text">
+            {field.labelParts ? renderRichParts(field.labelParts) : field.label}
+          </label>
+
+          {field.helperParts ? (
+            <span className="field-helper field-helper-inline">
+              {renderRichParts(field.helperParts)}
+            </span>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SuccessPage({ formData, submissionId }) {
   const embedRef = useRef(null);
   const [calStatus, setCalStatus] = useState('loading');
@@ -195,7 +228,7 @@ function SuccessPage({ formData, submissionId }) {
   }, [formData, submissionId]);
 
   return (
-    <div className="root-wrapper">
+    <div className="root-wrapper root-wrapper-success">
       <div className="ambient-glow" />
       <motion.div
         className="success-card success-card-booking"
@@ -270,13 +303,6 @@ function SuccessPage({ formData, submissionId }) {
         <p className="success-fine">
           Qortana Strategy Intake • Workflow, systems, governance, and infrastructure review
         </p>
-        <LegalLinks
-          tone="dark"
-          align="center"
-          condensed
-          showLabel={false}
-          className="success-legal-links"
-        />
       </motion.div>
     </div>
   );
@@ -453,13 +479,6 @@ export default function IntakeApp() {
   loadingRef.current = loading;
 
   useEffect(() => {
-    document.body.classList.add('body-intake-lock');
-    return () => {
-      document.body.classList.remove('body-intake-lock');
-    };
-  }, []);
-
-  useEffect(() => {
     const handler = (event) => {
       if (event.key !== 'Enter' || event.target.tagName === 'TEXTAREA' || loadingRef.current) return;
       handleNextRef.current?.();
@@ -470,6 +489,8 @@ export default function IntakeApp() {
   }, []);
 
   const currentStep = QORTANA_INTAKE_STEPS[currentStepIdx];
+  const currentFormFields = currentStep.fields.filter((field) => field.type !== 'consent');
+  const currentConsentFields = currentStep.fields.filter((field) => field.type === 'consent');
   const progress = ((currentStepIdx + 1) / QORTANA_INTAKE_STEPS.length) * 100;
   const isLastStep = currentStepIdx === QORTANA_INTAKE_STEPS.length - 1;
 
@@ -586,7 +607,7 @@ export default function IntakeApp() {
   }
 
   return (
-    <div className="root-wrapper">
+    <div className="root-wrapper root-wrapper-intake">
       <div className="ambient-glow" />
 
       <div className="form-card">
@@ -630,20 +651,15 @@ export default function IntakeApp() {
               </div>
 
               <div className="fields-container">
-                {currentStep.fields.map((field) => {
+                {currentFormFields.map((field) => {
                   const fieldId = `field-${field.name}`;
 
                   return (
-                    <div
-                      key={field.name}
-                      className={`field-group${field.type === 'consent' ? ' field-group-consent' : ''}`}
-                    >
-                      {field.type !== 'consent' ? (
-                        <label className="field-label" htmlFor={fieldId}>
-                          {field.label}
-                          {field.required && <span className="required-mark"> *</span>}
-                        </label>
-                      ) : null}
+                    <div key={field.name} className="field-group">
+                      <label className="field-label" htmlFor={fieldId}>
+                        {field.label}
+                        {field.required && <span className="required-mark"> *</span>}
+                      </label>
 
                       {field.type === 'textarea' ? (
                         <textarea
@@ -673,32 +689,6 @@ export default function IntakeApp() {
                             );
                           })}
                         </div>
-                      ) : field.type === 'consent' ? (
-                        <div className="consent-field">
-                          <input
-                            id={fieldId}
-                            type="checkbox"
-                            className="consent-input"
-                            checked={Boolean(formData[field.name])}
-                            onChange={(event) => updateFormData(field.name, event.target.checked)}
-                          />
-
-                          <label htmlFor={fieldId} className="consent-box" aria-hidden="true">
-                            {formData[field.name] ? <Check size={14} strokeWidth={3} /> : null}
-                          </label>
-
-                          <div className="consent-copy">
-                            <label htmlFor={fieldId} className="consent-text">
-                              {field.labelParts ? renderRichParts(field.labelParts) : field.label}
-                            </label>
-
-                            {field.helperParts ? (
-                              <span className="field-helper field-helper-inline">
-                                {renderRichParts(field.helperParts)}
-                              </span>
-                            ) : null}
-                          </div>
-                        </div>
                       ) : (
                         <>
                           <input
@@ -720,35 +710,79 @@ export default function IntakeApp() {
               </div>
             </div>
 
-            <div className="nav-row">
-              <button
-                onClick={handlePrev}
-                disabled={loading}
-                className={`nav-back${currentStepIdx === 0 ? ' nav-hidden' : ''}`}
-              >
-                ← Back
-              </button>
-              <button
-                onClick={handleNext}
-                disabled={loading}
-                className={`nav-next${loading ? ' nav-loading' : ''}`}
-              >
-                {loading ? 'Submitting...' : isLastStep ? 'Continue to Schedule' : 'Continue →'}
-              </button>
-            </div>
-            {isLastStep ? (
-              <p className="nav-fineprint">
-                By clicking “Continue to Schedule,” you submit your inquiry and, if selected
-                above, agree to the communication option(s) you chose.
-              </p>
+            {!isLastStep ? (
+              <>
+                <div className="nav-row">
+                  <button
+                    onClick={handlePrev}
+                    disabled={loading}
+                    className={`nav-back${currentStepIdx === 0 ? ' nav-hidden' : ''}`}
+                  >
+                    ← Back
+                  </button>
+                  <button
+                    onClick={handleNext}
+                    disabled={loading}
+                    className={`nav-next${loading ? ' nav-loading' : ''}`}
+                  >
+                    {loading ? 'Submitting...' : 'Continue →'}
+                  </button>
+                </div>
+                {stepError && <div className="checkout-error">{stepError}</div>}
+                {submitError && <div className="checkout-error">{submitError}</div>}
+              </>
             ) : null}
-            {stepError && <div className="checkout-error">{stepError}</div>}
-            {submitError && <div className="checkout-error">{submitError}</div>}
           </motion.div>
         </AnimatePresence>
-
-        <LegalLinks tone="dark" align="center" condensed className="intake-legal-links" />
       </div>
+
+      {isLastStep ? (
+        <motion.section
+          className="compliance-panel"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <div className="compliance-panel-copy">
+            <span className="compliance-kicker">Consent & Booking</span>
+            <h2>Confirm the handoff before you schedule.</h2>
+            <p>
+              The legal acknowledgements and reminder choice sit outside the intake card so the
+              last decision stays visible, readable, and easy to act on without turning the form
+              into a scroll box.
+            </p>
+          </div>
+
+          <div className="compliance-options">
+            {currentConsentFields.map((field) => renderConsentField(field, formData, updateFormData))}
+          </div>
+
+          <div className="nav-row nav-row-standalone">
+            <button
+              onClick={handlePrev}
+              disabled={loading}
+              className={`nav-back${currentStepIdx === 0 ? ' nav-hidden' : ''}`}
+            >
+              ← Back
+            </button>
+            <button
+              onClick={handleNext}
+              disabled={loading}
+              className={`nav-next${loading ? ' nav-loading' : ''}`}
+            >
+              {loading ? 'Submitting...' : 'Continue to Schedule'}
+            </button>
+          </div>
+
+          <p className="nav-fineprint">
+            By clicking “Continue to Schedule,” you submit your inquiry and, if selected above,
+            agree to the communication option(s) you chose.
+          </p>
+
+          {stepError && <div className="checkout-error">{stepError}</div>}
+          {submitError && <div className="checkout-error">{submitError}</div>}
+        </motion.section>
+      ) : null}
 
       <div className="enter-hint">
         Press <span className="enter-key">Enter</span> to continue
