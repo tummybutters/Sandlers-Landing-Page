@@ -4033,9 +4033,9 @@ textarea {
 .global-footer {
   position: relative;
   z-index: 2;
-  margin-top: 36px;
-  padding: 0 20px 28px;
-  background: linear-gradient(180deg, rgba(244, 238, 227, 0), rgba(244, 238, 227, 0.68) 18%, #f4eee3 100%);
+  margin-top: 0;
+  padding: 36px 20px 28px;
+  background: #f4eee3;
 }
 
 .global-footer-shell {
@@ -4402,8 +4402,8 @@ textarea {
   }
 
   .global-footer {
-    margin-top: 28px;
-    padding: 0 12px 18px;
+    margin-top: 0;
+    padding: 28px 12px 18px;
   }
 
   .global-footer-shell {
