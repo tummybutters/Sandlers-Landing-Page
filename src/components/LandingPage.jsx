@@ -1,8 +1,9 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Cable, Clock3, ServerCog, ShieldCheck } from 'lucide-react';
+import { Cable, Clock3, ServerCog } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MagneticFlightLink, RollingNavLink } from './PremiumMotionLinks';
+import { infrastructurePillars } from '../content/companySiteContent';
 
 const transition = { duration: 0.75, ease: [0.22, 1, 0.36, 1] };
 
@@ -12,32 +13,11 @@ const primaryNavItems = [
   { href: '#company', label: 'Company', detail: 'How Qortana works with you' },
 ];
 
-const deploymentCards = [
-  {
-    icon: ShieldCheck,
-    title: 'Secure Agent Environments',
-    body:
-      "Enterprise-grade sandboxed runtimes with the isolation, policy enforcement, and credential management that production AI demands. Your agents run in locked-down environments with strict network controls, file system boundaries, and audit trails — not on someone's laptop.",
-  },
-  {
-    icon: Clock3,
-    title: '24/7 Autonomous Workflows',
-    body:
-      'AI agents that operate continuously across Slack, email, SMS, and CRM — qualifying leads, managing handoffs, processing requests, and escalating only what requires a human. Deployed on dedicated infrastructure, not shared multi-tenant platforms.',
-  },
-  {
-    icon: Cable,
-    title: 'Platform Selection & Architecture',
-    body:
-      'We evaluate your operations, map the right platforms to the right problems, and design architectures that scale without creating a maintenance nightmare. We know which models and agent frameworks actually hold up under load.',
-  },
-  {
-    icon: ServerCog,
-    title: 'Implementation & Ongoing Management',
-    body:
-      "We don't hand you a document and disappear. We deploy, configure, integrate, monitor, and maintain the full system so your team gets the output without owning the infrastructure burden.",
-  },
-];
+const deploymentCardIcons = {
+  'autonomous-workers': ServerCog,
+  'claude-workspaces': Clock3,
+  'deployment-models': Cable,
+};
 
 const processSteps = [
   {
@@ -291,6 +271,7 @@ export default function LandingPage() {
             </p>
             <div className="company-section-actions">
               <MagneticFlightLink to="/intake" label="Book a strategy call" />
+              <MagneticFlightLink to="/about" label="About Qortana" variant="light" />
             </div>
           </div>
         </section>
@@ -298,26 +279,38 @@ export default function LandingPage() {
         <section id="deploy" className="company-section">
           <div className="company-section-header">
             <span className="company-section-label">What We Deploy</span>
-            <h2>Autonomous AI infrastructure, deployed properly.</h2>
+            <h2>Autonomous AI infrastructure, deployed in the layer it belongs.</h2>
           </div>
 
-          <div className="company-capability-grid">
-            {deploymentCards.map(({ icon: Icon, title, body }, index) => (
-              <motion.article
-                key={title}
-                className="company-card"
-                initial={{ opacity: 0, y: 18 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ ...transition, delay: index * 0.05 }}
-              >
-                <div className="company-card-icon">
-                  <Icon size={20} />
-                </div>
-                <h3>{title}</h3>
-                <p>{body}</p>
-              </motion.article>
-            ))}
+          <div className="company-pillar-grid">
+            {infrastructurePillars.map(({ slug, title, body, href, label }, index) => {
+              const Icon = deploymentCardIcons[slug];
+
+              return (
+                <motion.article
+                  key={slug}
+                  className="company-card"
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ ...transition, delay: index * 0.05 }}
+                >
+                  <div className="company-card-icon">
+                    <Icon size={20} />
+                  </div>
+                  <h3>{title}</h3>
+                  <p>{body}</p>
+                  <Link to={href} className="company-inline-link">
+                    {label}
+                  </Link>
+                </motion.article>
+              );
+            })}
+          </div>
+
+          <div className="company-section-actions">
+            <MagneticFlightLink to="/intake" label="Book a strategy call" />
+            <MagneticFlightLink to="/infrastructure" label="Explore infrastructure" variant="light" />
           </div>
         </section>
 

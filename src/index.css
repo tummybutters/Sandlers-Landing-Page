@@ -928,6 +928,136 @@ textarea {
   color: rgba(246, 235, 218, 0.84);
 }
 
+.company-page-main {
+  padding-bottom: 96px;
+}
+
+.company-page-hero {
+  position: relative;
+  padding: 88px 0 54px;
+}
+
+.company-page-hero-copy {
+  width: min(1320px, calc(100% - 120px));
+  margin: 0 auto;
+}
+
+.company-page-title {
+  max-width: none;
+  margin: 18px 0 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: clamp(3rem, 5vw, 5.2rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 0.96;
+  color: #1b140d;
+  text-wrap: balance;
+}
+
+.company-page-intro {
+  max-width: 860px;
+  margin-top: 24px;
+  font-size: 1.06rem;
+  line-height: 1.92;
+  color: #544132;
+}
+
+.company-page-intro-secondary {
+  margin-top: 16px;
+  color: #685140;
+}
+
+.company-pillar-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 48px;
+}
+
+.company-card .company-inline-link,
+.company-page-story-card .company-inline-link {
+  margin-top: 26px;
+}
+
+.company-inline-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  padding: 10px 14px;
+  border: 1px solid rgba(120, 92, 54, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 250, 242, 0.82);
+  box-shadow:
+    0 12px 24px rgba(70, 48, 18, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #67461c;
+  transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease;
+}
+
+.company-inline-link:hover,
+.company-inline-link:focus-visible {
+  border-color: rgba(145, 107, 50, 0.18);
+  background: rgba(255, 252, 246, 0.96);
+  color: #22160d;
+}
+
+.company-inline-link-dark {
+  border-color: rgba(255, 245, 230, 0.14);
+  background: rgba(255, 250, 242, 0.08);
+  box-shadow: none;
+  color: #f2dac1;
+}
+
+.company-inline-link-dark:hover,
+.company-inline-link-dark:focus-visible {
+  border-color: rgba(255, 245, 230, 0.24);
+  background: rgba(255, 250, 242, 0.14);
+  color: #fff6ea;
+}
+
+.company-page-story-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 48px;
+}
+
+.company-page-story-card {
+  position: relative;
+  z-index: 1;
+  min-height: 280px;
+  padding: 34px 30px 30px;
+  border: 1px solid rgba(96, 75, 40, 0.12);
+  background: rgba(255, 252, 247, 0.88);
+  box-shadow: 0 18px 40px rgba(69, 48, 18, 0.05);
+}
+
+.company-page-story-card h3 {
+  max-width: 15ch;
+  font-size: 1.26rem;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #21170f;
+}
+
+.company-page-story-card p {
+  margin-top: 18px;
+  font-size: 1rem;
+  line-height: 1.86;
+  color: #594636;
+}
+
+.company-fit-signals-wide {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 @media (max-width: 1100px) {
   .company-header {
     padding-left: 14px;
@@ -939,8 +1069,10 @@ textarea {
     width: min(100vw - 28px, 100%);
   }
 
+  .company-pillar-grid,
   .company-process-grid,
   .company-fit-signals,
+  .company-page-story-grid,
   .company-results-card {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1006,6 +1138,19 @@ textarea {
     padding-bottom: 84px;
   }
 
+  .company-page-hero {
+    padding-top: 58px;
+    padding-bottom: 38px;
+  }
+
+  .company-page-hero-copy {
+    width: 100%;
+  }
+
+  .company-page-title {
+    font-size: clamp(2.8rem, 12vw, 4.3rem);
+  }
+
   .company-hero-copy {
     width: 100%;
   }
@@ -1054,9 +1199,11 @@ textarea {
   }
 
   .company-capability-grid,
+  .company-pillar-grid,
   .company-process-grid,
   .company-fit-signals,
   .company-faq-grid,
+  .company-page-story-grid,
   .company-results-card {
     grid-template-columns: 1fr;
   }
@@ -1064,7 +1211,8 @@ textarea {
   .company-card,
   .company-process-card,
   .company-faq-card,
-  .company-results-card {
+  .company-results-card,
+  .company-page-story-card {
     padding: 28px 20px 24px;
     min-height: auto;
   }
