@@ -104,6 +104,47 @@ export const SHEET_HEADERS = [
   SHEET_COLUMNS.websiteJson,
 ];
 
+export const SANDLER_SHEET_HEADERS = [
+  'record_submission_id',
+  'record_source',
+  'record_created_at_utc',
+  'record_updated_at_utc',
+  'ops_lifecycle_stage',
+  'ops_intake_status',
+  'ops_verification_status',
+  'ops_booking_status',
+  'ops_onboarding_status',
+  'ops_owner',
+  'ops_priority',
+  'ops_next_action',
+  'ops_ai_summary',
+  'ops_internal_notes',
+  'client_business_name',
+  'client_full_name',
+  'client_contact_email',
+  'client_phone_e164',
+  'client_service_area',
+  'contact_preference',
+  'agent_role_type',
+  'agent_business_structure',
+  'sales_top_services',
+  'workflow_biggest_time_sink',
+  'workflow_active_opportunity_volume',
+  'workflow_weekly_quote_volume',
+  'workflow_recurring_workflow_tasks',
+  'workflow_current_stall_point',
+  'systems_active_systems',
+  'systems_priority_accounts',
+  'workflow_file_storage_home',
+  'workflow_commission_tracking',
+  'governance_required_approvals',
+  'value_immediate_value',
+  'consent_legal_accepted',
+  'consent_legal_accepted_at_utc',
+  'intake_label',
+  'intake_raw_json',
+];
+
 function columnNumberToLetter(columnNumber) {
   let number = columnNumber;
   let output = '';
@@ -157,15 +198,53 @@ function getGoogleAuth(env) {
   });
 }
 
-function getSheetRange(sheetName) {
-  return `${sheetName}!A:${columnNumberToLetter(SHEET_HEADERS.length)}`;
+function getSheetRange(sheetName, headerCount) {
+  return `${sheetName}!A:${columnNumberToLetter(headerCount)}`;
 }
 
-function getRowRange(sheetName, rowNumber) {
-  return `${sheetName}!A${rowNumber}:${columnNumberToLetter(SHEET_HEADERS.length)}${rowNumber}`;
+function getRowRange(sheetName, rowNumber, headerCount) {
+  return `${sheetName}!A${rowNumber}:${columnNumberToLetter(headerCount)}${rowNumber}`;
 }
 
-function buildRowValues(submission) {
+function resolveSheetName(env, submission) {
+  const defaultSheetName = env.GOOGLE_SHEETS_SHEET_NAME || 'Submissions';
+  const sandlerSheetName = env.GOOGLE_SHEETS_SANDLER_SHEET_NAME || 'sandler';
+  const rawIntake = submission?.rawIntake || {};
+
+  if (
+    submission?.source === 'sandler_agent_intake' ||
+    rawIntake.intakeType === 'sandler_agent_intake' ||
+    rawIntake.landingVariant === 'sales_assistant_legacy'
+  ) {
+    return sandlerSheetName;
+  }
+
+  return defaultSheetName;
+}
+
+function isSandlerSubmission(submission) {
+  const rawIntake = submission?.rawIntake || {};
+
+  return (
+    submission?.source === 'sandler_agent_intake' ||
+    rawIntake.intakeType === 'sandler_agent_intake' ||
+    rawIntake.landingVariant === 'sales_assistant_legacy'
+  );
+}
+
+function formatCellValue(value) {
+  if (Array.isArray(value)) {
+    return value.join(' | ');
+  }
+
+  if (typeof value === 'boolean') {
+    return value ? 'true' : 'false';
+  }
+
+  return value || '';
+}
+
+function buildDefaultRowValues(submission) {
   const consent = submission.consent || {};
   const messaging = submission.messaging || {};
 
@@ -231,7 +310,65 @@ function buildRowValues(submission) {
   ];
 }
 
-async function ensureSheetHeaders(sheets, spreadsheetId, sheetName) {
+function buildSandlerRowValues(submission) {
+  const rawIntake = submission.rawIntake || {};
+  const consent = submission.consent || {};
+  const customer = submission.customer || {};
+  const answers = rawIntake.answers || {};
+
+  return [
+    submission.submissionId,
+    submission.source || rawIntake.intakeType || '',
+    submission.createdAt,
+    submission.updatedAt,
+    'intake_submitted',
+    'new',
+    'unreviewed',
+    'not_booked',
+    'not_started',
+    '',
+    'normal',
+    '',
+    '',
+    '',
+    customer.businessName || rawIntake.businessName || '',
+    customer.fullName || rawIntake.fullName || '',
+    customer.contactEmail || rawIntake.contactEmail || '',
+    customer.phoneNumber || rawIntake.phoneNumber || '',
+    customer.serviceArea || rawIntake.territory || '',
+    submission.preferredContact || '',
+    formatCellValue(rawIntake.roleType || answers.roleType),
+    formatCellValue(rawIntake.businessStructure || answers.businessStructure),
+    formatCellValue(rawIntake.topServices || answers.topServices),
+    formatCellValue(rawIntake.biggestTimeSink || answers.biggestTimeSink),
+    formatCellValue(rawIntake.activeOpportunityVolume || answers.activeOpportunityVolume),
+    formatCellValue(rawIntake.weeklyQuoteVolume || answers.weeklyQuoteVolume),
+    formatCellValue(rawIntake.recurringWorkflowTasks || answers.recurringWorkflowTasks),
+    formatCellValue(rawIntake.currentStallPoint || answers.currentStallPoint),
+    formatCellValue(rawIntake.activeSystems || answers.activeSystems),
+    formatCellValue(rawIntake.priorityAccounts || answers.priorityAccounts),
+    formatCellValue(rawIntake.fileStorageHome || answers.fileStorageHome),
+    formatCellValue(rawIntake.commissionTracking || answers.commissionTracking),
+    formatCellValue(rawIntake.requiredApprovals || answers.requiredApprovals),
+    formatCellValue(rawIntake.immediateValue || answers.immediateValue),
+    consent.legalAccepted ? 'true' : 'false',
+    consent.legalAcceptedAt || '',
+    rawIntake.intakeLabel || 'Sandler Agent Intake',
+    JSON.stringify(rawIntake),
+  ];
+}
+
+function buildRowValues(submission) {
+  return isSandlerSubmission(submission)
+    ? buildSandlerRowValues(submission)
+    : buildDefaultRowValues(submission);
+}
+
+function resolveSheetHeaders(submission) {
+  return isSandlerSubmission(submission) ? SANDLER_SHEET_HEADERS : SHEET_HEADERS;
+}
+
+async function ensureSheetHeaders(sheets, spreadsheetId, sheetName, headers) {
   const existing = await sheets.spreadsheets.values.get({
     spreadsheetId,
     range: `${sheetName}!1:1`,
@@ -239,8 +376,8 @@ async function ensureSheetHeaders(sheets, spreadsheetId, sheetName) {
 
   const currentHeaders = existing.data.values?.[0] || [];
   const matches =
-    currentHeaders.length === SHEET_HEADERS.length &&
-    currentHeaders.every((value, index) => value === SHEET_HEADERS[index]);
+    currentHeaders.length === headers.length &&
+    currentHeaders.every((value, index) => value === headers[index]);
 
   if (matches) return;
 
@@ -249,7 +386,7 @@ async function ensureSheetHeaders(sheets, spreadsheetId, sheetName) {
     range: `${sheetName}!1:1`,
     valueInputOption: 'RAW',
     requestBody: {
-      values: [SHEET_HEADERS],
+      values: [headers],
     },
   });
 }
@@ -258,9 +395,10 @@ function createRowRecord(headerRow, row) {
   return Object.fromEntries(headerRow.map((header, index) => [header, row[index] || '']));
 }
 
-async function getSheetsClient(env) {
+async function getSheetsClient(env, options = {}) {
   const spreadsheetId = env.GOOGLE_SHEETS_SPREADSHEET_ID;
-  const sheetName = env.GOOGLE_SHEETS_SHEET_NAME || 'Submissions';
+  const sheetName = options.sheetName || resolveSheetName(env, options.submission);
+  const headers = options.headers || resolveSheetHeaders(options.submission);
 
   if (!spreadsheetId) {
     throw new Error('GOOGLE_SHEETS_SPREADSHEET_ID is not configured');
@@ -270,7 +408,7 @@ async function getSheetsClient(env) {
   const sheets = google.sheets({ version: 'v4', auth });
 
   try {
-    await ensureSheetHeaders(sheets, spreadsheetId, sheetName);
+    await ensureSheetHeaders(sheets, spreadsheetId, sheetName, headers);
   } catch (error) {
     if (isPermissionError(error)) {
       throw formatGoogleAccessError('Google Sheet', env, error);
@@ -283,18 +421,18 @@ async function getSheetsClient(env) {
     throw error;
   }
 
-  return { spreadsheetId, sheetName, sheets };
+  return { spreadsheetId, sheetName, sheets, headers };
 }
 
-async function getSheetRecords(env) {
-  const { spreadsheetId, sheetName, sheets } = await getSheetsClient(env);
+async function getSheetRecords(env, options = {}) {
+  const { spreadsheetId, sheetName, sheets, headers } = await getSheetsClient(env, options);
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId,
-    range: getSheetRange(sheetName),
+    range: getSheetRange(sheetName, headers.length),
   });
 
   const rows = response.data.values || [];
-  const headerRow = rows[0] || SHEET_HEADERS;
+  const headerRow = rows[0] || headers;
 
   return { spreadsheetId, sheetName, sheets, rows, headerRow };
 }
@@ -345,7 +483,7 @@ async function updateRowRecord(env, matchRowIndex, mutateRecord) {
 
   await sheets.spreadsheets.values.update({
     spreadsheetId,
-    range: getRowRange(sheetName, rowNumber),
+    range: getRowRange(sheetName, rowNumber, headerRow.length),
     valueInputOption: 'RAW',
     requestBody: {
       values: [updatedRow],
@@ -356,12 +494,13 @@ async function updateRowRecord(env, matchRowIndex, mutateRecord) {
 }
 
 export async function appendSubmissionToSheet(submission, env) {
-  const { spreadsheetId, sheetName, sheets } = await getSheetsClient(env);
+  const headers = resolveSheetHeaders(submission);
+  const { spreadsheetId, sheetName, sheets } = await getSheetsClient(env, { submission, headers });
 
   try {
     await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: getSheetRange(sheetName),
+      range: getSheetRange(sheetName, headers.length),
       valueInputOption: 'RAW',
       insertDataOption: 'INSERT_ROWS',
       requestBody: {
