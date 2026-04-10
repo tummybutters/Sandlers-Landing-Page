@@ -29,16 +29,12 @@ export default function NathanButcherCard() {
   return (
     <SecretBusinessCard
       routeTitle="Nathan Butcher | Qortana"
-      firstName="Nathan"
-      lastName="Butcher"
       fullName="Nathan Butcher"
       title="AI & Automation Engineer"
       note="Building your autonomous workforce."
       brandHref={brandHref}
       primaryActions={contactLinks}
-      saveFileName="nathan-butcher.vcf"
-      phoneNumber="+1-714-235-3089"
-      socialLinks={[{ href: 'https://www.linkedin.com/in/nathanbutcher123' }]}
+      contactDownloadPath="/contacts/nathan-butcher.vcf"
     />
   );
 }

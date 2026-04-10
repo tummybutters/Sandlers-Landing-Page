@@ -1,0 +1,11 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Butcher;Thomas;;;
+FN:Thomas Butcher
+ORG:Qortana
+TITLE:Founding Engineer
+TEL;TYPE=CELL:+1-949-395-1074
+EMAIL;TYPE=INTERNET:thomasbutcher@qortana.com
+URL:https://qortana.com
+NOTE:Building your autonomous workforce.
+END:VCARD

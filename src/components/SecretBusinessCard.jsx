@@ -1,117 +1,49 @@
 import { useState } from 'react';
 import useSecretRouteMeta from '../hooks/useSecretRouteMeta';
 
-function buildVCard({
-  firstName,
-  lastName,
-  fullName,
-  company,
-  title,
-  phoneNumber,
-  email,
-  website,
-  socialLinks = [],
-  note,
-}) {
-  const lines = [
-    'BEGIN:VCARD',
-    'VERSION:3.0',
-    `N:${lastName};${firstName};;;`,
-    `FN:${fullName}`,
-    `ORG:${company}`,
-    `TITLE:${title}`,
-  ];
-
-  if (phoneNumber) {
-    lines.push(`TEL;TYPE=CELL:${phoneNumber}`);
-  }
-
-  if (email) {
-    lines.push(`EMAIL;TYPE=INTERNET:${email}`);
-  }
-
-  if (website) {
-    lines.push(`URL:${website}`);
-  }
-
-  socialLinks.forEach((link) => {
-    if (link.href) {
-      lines.push(`URL:${link.href}`);
-    }
-  });
-
-  if (note) {
-    lines.push(`NOTE:${note}`);
-  }
-
-  lines.push('END:VCARD');
-  return lines.join('\r\n');
-}
-
 export default function SecretBusinessCard({
   routeTitle,
-  firstName,
-  lastName,
   fullName,
   title,
   note,
   brandHref,
   primaryActions,
-  saveFileName,
-  phoneNumber,
-  email,
-  socialLinks,
+  contactDownloadPath,
 }) {
-  const [saveLabel, setSaveLabel] = useState('Save Contact');
+  const [saveLabel, setSaveLabel] = useState('Add to Contacts');
 
   useSecretRouteMeta(routeTitle);
 
   const handleSaveContact = async () => {
-    const vcard = buildVCard({
-      firstName,
-      lastName,
-      fullName,
-      company: 'Qortana',
-      title,
-      phoneNumber,
-      email,
-      website: brandHref,
-      socialLinks,
-      note,
-    });
-    const blob = new Blob([vcard], { type: 'text/vcard;charset=utf-8' });
-    const file = new File([blob], saveFileName, { type: 'text/vcard' });
-
     try {
+      const response = await fetch(contactDownloadPath);
+
+      if (!response.ok) {
+        throw new Error('Unable to load contact file');
+      }
+
+      const blob = await response.blob();
+      const fileName = contactDownloadPath.split('/').pop() || `${fullName.toLowerCase().replace(/\s+/g, '-')}.vcf`;
+      const file = new File([blob], fileName, { type: 'text/vcard' });
+
       if (navigator.canShare && navigator.share && navigator.canShare({ files: [file] })) {
         await navigator.share({
           files: [file],
           title: `${fullName} Contact`,
         });
         setSaveLabel('Shared');
-        window.setTimeout(() => setSaveLabel('Save Contact'), 1600);
+        window.setTimeout(() => setSaveLabel('Add to Contacts'), 1600);
         return;
       }
     } catch {
-      // Fall back to download behavior below when native share is unavailable or cancelled.
+      // Fall through to opening the .vcf file directly.
     }
 
-    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.href = url;
-    link.download = saveFileName;
-
-    if ('download' in HTMLAnchorElement.prototype) {
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } else {
-      window.location.href = `data:text/vcard;charset=utf-8,${encodeURIComponent(vcard)}`;
-    }
-
-    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-    setSaveLabel('Saved');
-    window.setTimeout(() => setSaveLabel('Save Contact'), 1600);
+    link.href = contactDownloadPath;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
   };
 
   return (
