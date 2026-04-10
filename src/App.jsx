@@ -11,6 +11,7 @@ const InfrastructurePage = lazy(() => import('./components/InfrastructurePage'))
 const InfrastructureDetailPage = lazy(() => import('./components/InfrastructureDetailPage'));
 const LegalPage = lazy(() => import('./components/LegalPage'));
 const NathanButcherCard = lazy(() => import('./components/NathanButcherCard'));
+const ThomasButcherCard = lazy(() => import('./components/ThomasButcherCard'));
 const SalesAssistantIntakeApp = lazy(() => import('./components/SalesAssistantIntakeApp'));
 const SalesAssistantLandingPage = lazy(() => import('./components/SalesAssistantLandingPage'));
 
@@ -32,7 +33,9 @@ function TemplatePreview({ templateId }) {
 function AppRoutes() {
   const location = useLocation();
   const hideFooter =
-    location.pathname.startsWith('/sales-assistant-intake') || location.pathname === '/nathanbutcher';
+    location.pathname.startsWith('/sales-assistant-intake') ||
+    location.pathname === '/nathanbutcher' ||
+    location.pathname === '/thomasbutcher';
 
   return (
     <>
@@ -49,6 +52,7 @@ function AppRoutes() {
           <Route path="/sales-assistant-intake/quiz" element={<SalesAssistantIntakeApp />} />
           <Route path="/intake" element={<IntakeApp />} />
           <Route path="/nathanbutcher" element={<NathanButcherCard />} />
+          <Route path="/thomasbutcher" element={<ThomasButcherCard />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/infrastructure" element={<InfrastructurePage />} />
           <Route
